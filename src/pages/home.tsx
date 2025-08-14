@@ -711,7 +711,7 @@ export default function Home() {
                 <div className="text-purple-100">Average monthly earnings</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-yellow-300">5 mins</div>
+                <div className="text-3xl font-bold text-yellow-300">2 mins</div>
                 <div className="text-purple-100">Average video length</div>
               </div>
               <div>
@@ -825,11 +825,11 @@ export default function Home() {
               <ul className="space-y-4 text-gray-400">
                 <li className="flex items-center space-x-2">
                   <Mail className="w-4 h-4" />
-                  <span>hello@adbox.gh</span>
+                  <span>info@adboxgh.com</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Phone className="w-4 h-4" />
-                  <span>+233 50 123 4567</span>
+                  <span>+233 26 267 7977</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <MapPin className="w-4 h-4" />
