@@ -160,10 +160,10 @@ export default function Home() {
                   <Play className="w-5 h-5" />
                   <span>Download for Android</span>
                 </button>
-                <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-adbox-primary transition-colors flex items-center justify-center space-x-2">
+                {/* <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-adbox-primary transition-colors flex items-center justify-center space-x-2">
                   <Play className="w-5 h-5" />
                   <span>Watch Demo</span>
-                </button>
+                </button> */}
               </div>
             </div>
 
