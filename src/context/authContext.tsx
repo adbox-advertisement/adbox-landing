@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import ApiService from "@/helpers/api.service";
-import { Storage } from "@/helpers/local.storage"; // <-- token persistence
+import { Storage } from "@/helpers/local.storage";
+import { PUBLISHER_DASHBOARD_URL } from "@/helpers/constants";
 interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
@@ -37,12 +38,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         { email, password }
       );
       const data = response.data;
-
-      console.log("Login response data:", data);
-
       if (data?.token) {
         Storage.saveToken(data.token);
-        window.location.href = `https://dashboard.adboxgh.com?token=${data.token}`;
+        window.location.href = `${PUBLISHER_DASHBOARD_URL}?token=${data.token}`;
+        // window.location.href = `http://localhost:5174?token=${data.token}`;
       } else {
         setError(data?.message || "Login failed");
       }

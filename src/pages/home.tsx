@@ -17,6 +17,8 @@ import {
   X,
 } from "lucide-react";
 
+import ghanaCity from "../assets/Ghana_digital_cityscape_background_b899cd3b.png";
+import publisherImage from "../assets/Publisher_viewing_Adbox_analytics_dashboard_a90a6399.png";
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -155,7 +157,7 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/attached_assets/generated_images/Ghana_digital_cityscape_background_b899cd3b.png"
+            src={ghanaCity}
             alt="Ghana digital cityscape showcasing mobile-first digital economy"
             className="w-full h-full object-cover opacity-25 transform scale-105 animate-fade-in"
           />
@@ -343,7 +345,7 @@ export default function Home() {
             <div className="relative animate-fade-in-up animation-delay-200">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 group cursor-pointer">
                 <img
-                  src="/attached_assets/generated_images/Publisher_viewing_Adbox_analytics_dashboard_a90a6399.png"
+                  src={publisherImage}
                   alt="Publisher viewing Adbox analytics dashboard showing campaign performance metrics"
                   className="w-full h-auto"
                 />

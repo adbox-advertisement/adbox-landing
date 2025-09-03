@@ -1,0 +1,2 @@
+export const PUBLISHER_DASHBOARD_URL = import.meta.env
+  .VITE_PUBLISHER_DASHBOARD_URL;
