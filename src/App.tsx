@@ -5,11 +5,16 @@ import { Toaster } from "./components/ui/toaster";
 import { TooltipProvider } from "./components/ui/tooltip";
 import NotFound from "./pages/not-found";
 import Home from "./pages/home";
+import SignIn from "./pages/signin";
+import SignUp from "./pages/signup";
+import { AuthProvider } from "./context/authContext";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/signin" component={SignIn} />
+      <Route path="/signup" component={SignUp} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -17,12 +22,14 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }
 
