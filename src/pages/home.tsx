@@ -159,7 +159,7 @@ export default function Home() {
           <img
             src={ghanaCity}
             alt="Ghana digital cityscape showcasing mobile-first digital economy"
-            className="w-full h-full object-cover opacity-25 transform scale-105 animate-fade-in"
+            className="w-full h-full object-cover opacity-75 transform scale-105 animate-fade-in brightness-75"
           />
           <div className="absolute inset-0 bg-gradient-primary/75"></div>
           {/* Additional overlay for better text readability */}
@@ -168,26 +168,26 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up text-zinc-50">
                 Reach Ghana's
                 <br />
-                <span className="text-yellow-300 animate-pulse">
+                <span className="text-gray-100 animate-pulse">
                   50,000+ Mobile Users
                 </span>
                 <br />
                 with Precision
               </h1>
-              <p className="text-xl text-purple-100 mb-8 max-w-lg mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
+              <p className="text-xl text-stone-100 mb-8 max-w-lg mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
                 The most effective digital advertising platform for brands
                 targeting Ghana's engaged mobile audience. Launch campaigns that
                 convert.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-400">
-                <button className="bg-white text-adbox-primary px-8 py-4 rounded-full font-semibold hover:bg-gray-100 hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl">
+                <button className="bg-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-purple-700 hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl">
                   <Briefcase className="w-5 h-5" />
                   <span>Launch Campaign</span>
                 </button>
-                <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-adbox-primary hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2">
+                <button className="border-2 border-purple-500 text-purple-600 bg-white/90 backdrop-blur-sm px-8 py-4 rounded-full font-semibold hover:bg-purple-500 hover:text-white hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2">
                   <Video className="w-5 h-5" />
                   <span>View Demo</span>
                 </button>
@@ -206,9 +206,9 @@ export default function Home() {
                       <div className="text-sm font-semibold text-gray-800">
                         Live Campaign Analytics
                       </div>
-                      <div className="text-2xl font-bold text-green-600 animate-bounce">
+                      {/* <div className="text-2xl font-bold text-green-600 animate-bounce">
                         ₵12,450
-                      </div>
+                      </div> */}
                       <div className="text-xs text-gray-500">
                         Monthly Ad Spend
                       </div>
@@ -237,15 +237,15 @@ export default function Home() {
                 </div>
               </div>
               {/* Floating elements */}
-              <div className="absolute -top-4 -left-4 bg-yellow-300 text-adbox-primary px-3 py-2 rounded-full text-sm font-bold animate-bounce hover:scale-110 transition-transform cursor-pointer">
+              {/* <div className="absolute -top-4 -left-4 bg-yellow-300 text-adbox-primary px-3 py-2 rounded-full text-sm font-bold animate-bounce hover:scale-110 transition-transform cursor-pointer">
                 85% CTR
-              </div>
+              </div> */}
               <div className="absolute top-20 -right-8 bg-green-400 text-white px-3 py-2 rounded-full text-sm font-bold animate-pulse hover:scale-110 transition-transform cursor-pointer">
                 ₵0.75 CPV
               </div>
-              <div className="absolute bottom-8 -left-6 bg-blue-500 text-white px-3 py-2 rounded-full text-sm font-bold animate-bounce animation-delay-500 hover:scale-110 transition-transform cursor-pointer">
+              {/* <div className="absolute bottom-8 -left-6 bg-blue-500 text-white px-3 py-2 rounded-full text-sm font-bold animate-bounce animation-delay-500 hover:scale-110 transition-transform cursor-pointer">
                 2.5M Reach
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

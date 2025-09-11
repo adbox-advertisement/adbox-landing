@@ -33,10 +33,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError("");
 
     try {
-      const response = await ApiService.post_api(
-        "/api/v1/auth/publisher/signin",
-        { email, password }
-      );
+      const response = await ApiService.post_api("/auth/publisher/signin", {
+        email,
+        password,
+      });
       const data = response.data;
       if (data?.token) {
         Storage.saveToken(data.token);
