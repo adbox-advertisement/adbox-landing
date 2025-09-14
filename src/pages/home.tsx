@@ -1,35 +1,175 @@
-import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { useState, useEffect, useRef } from "react";
 import {
   Play,
-  Coins,
   Smartphone,
   Shield,
   Video,
   Users,
   Clock,
   Briefcase,
-  Star,
   Phone,
   Mail,
   MapPin,
   Menu,
   X,
+  ArrowRight,
+  TrendingUp,
+  Target,
+  Zap,
+  ChevronDown,
+  Globe,
+  Award,
+  BarChart3,
 } from "lucide-react";
+import { Link } from "wouter";
+// Define types for state and props
+interface MousePosition {
+  x: number;
+  y: number;
+}
 
-import ghanaCity from "../assets/Ghana_digital_cityscape_background_b899cd3b.png";
-import publisherImage from "../assets/Publisher_viewing_Adbox_analytics_dashboard_a90a6399.png";
-export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+interface AnimatedStats {
+  publishers: number;
+  adSpend: number;
+  completion: number;
+  costPerView: number;
+}
+
+interface FloatingCardProps {
+  children: React.ReactNode;
+  delay?: number;
+}
+
+export default function ModernAdboxLanding() {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [mousePosition, setMousePosition] = useState<MousePosition>({
+    x: 0,
+    y: 0,
+  });
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
+  const [animatedStats, setAnimatedStats] = useState<AnimatedStats>({
+    publishers: 0,
+    adSpend: 0,
+    completion: 0,
+    costPerView: 0,
+  });
+  const heroRef = useRef<HTMLElement | null>(null);
+  const parallaxRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    // Optimize event handlers with throttling
+    let scrollTimeout: NodeJS.Timeout;
+    let mouseTimeout: NodeJS.Timeout;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const scrollY = window.scrollY;
+        setIsScrolled(scrollY > 50);
+
+        // Parallax effect for elements
+        if (parallaxRef.current) {
+          const parallaxElements =
+            parallaxRef.current.querySelectorAll(".parallax-element");
+          parallaxElements.forEach((el: Element, index: number) => {
+            const speed = 0.3 + index * 0.1; // Reduced speed for smoother effect
+            (el as HTMLElement).style.transform = `translateY(${
+              scrollY * speed
+            }px)`;
+          });
+        }
+      }, 16); // Throttle to ~60fps
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handleMouseMove = (e: MouseEvent) => {
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      }, 16); // Throttle mouse updates
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      clearTimeout(scrollTimeout);
+      clearTimeout(mouseTimeout);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  const heroGradientStyle = {
+    background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.15) 0%, rgba(16, 24, 40, 0.8) 50%)`,
+  };
+
+  // Animated counter effect
+  useEffect(() => {
+    const animateStats = () => {
+      const targets: AnimatedStats = {
+        publishers: 1200,
+        adSpend: 45,
+        completion: 92,
+        costPerView: 65,
+      };
+      const duration = 2000;
+      const steps = 60;
+      const increment = duration / steps;
+
+      let current: AnimatedStats = {
+        publishers: 0,
+        adSpend: 0,
+        completion: 0,
+        costPerView: 0,
+      };
+
+      const timer = setInterval(() => {
+        current.publishers = Math.min(
+          current.publishers + targets.publishers / steps,
+          targets.publishers
+        );
+        current.adSpend = Math.min(
+          current.adSpend + targets.adSpend / steps,
+          targets.adSpend
+        );
+        current.completion = Math.min(
+          current.completion + targets.completion / steps,
+          targets.completion
+        );
+        current.costPerView = Math.min(
+          current.costPerView + targets.costPerView / steps,
+          targets.costPerView
+        );
+
+        setAnimatedStats({ ...current });
+
+        if (current.publishers >= targets.publishers) {
+          clearInterval(timer);
+        }
+      }, increment);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        animateStats();
+        observer.disconnect();
+      }
+    });
+
+    const statsSection = document.getElementById("stats-section");
+    if (statsSection) observer.observe(statsSection);
+
+    console.log("Observer set on stats section", heroGradientStyle);
+    return () => observer.disconnect();
+  }, []);
+
+  // Auto-sliding testimonials
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
@@ -40,58 +180,168 @@ export default function Home() {
     setIsMenuOpen(false);
   };
 
+  const FloatingCard: React.FC<FloatingCardProps> = ({
+    children,
+    delay = 0,
+  }) => (
+    <div
+      className="floating-card"
+      style={{
+        transform: `translateY(${Math.sin(Date.now() * 0.001 + delay) * 10}px)`,
+        animation: `float 6s ease-in-out infinite ${delay}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
+
   return (
-    <div className="font-inter text-gray-900">
+    <div className="font-inter text-gray-900 overflow-x-hidden">
+      {/* Custom CSS for animations */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-20px) rotate(1deg); }
+          66% { transform: translateY(-10px) rotate(-1deg); }
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3); }
+        }
+
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(50px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
+        .gradient-animated {
+          background: linear-gradient(-45deg, #8B5CF6, #A855F7, #C084FC, #DDD6FE);
+          background-size: 400% 400%;
+          animation: gradient-shift 4s ease infinite;
+        }
+
+        .floating-card {
+          transition: transform 0.3s ease;
+        }
+
+        .glow-effect {
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .slide-up-animation {
+          animation: slide-up 0.8s ease forwards;
+        }
+
+        .hover-lift {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .text-gradient {
+          background: linear-gradient(135deg, #8B5CF6, #EC4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .backdrop-blur-glass {
+          backdrop-filter: blur(20px);
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card-shimmer {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background-size: 200% 100%;
+          animation: shimmer 2s infinite;
+        }
+
+        .feature-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        .feature-card:hover::before {
+          left: 100%;
+        }
+      `}</style>
+
       {/* Navigation */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-white/95 backdrop-blur-md border-b border-gray-100"
-            : "bg-white/90 backdrop-blur-md border-b border-gray-100"
+            ? "backdrop-blur-glass border-b border-white/20"
+            : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Play className="text-white w-4 h-4" />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-12 h-12 gradient-animated rounded-xl flex items-center justify-center glow-effect">
+                  <Play className="text-white w-6 h-6" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
               </div>
-              <span className="font-bold text-xl text-gray-900">Adbox</span>
+              <span className="font-bold text-2xl text-white">Adbox</span>
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => scrollToSection("features")}
-                className="text-gray-600 hover:text-adbox-primary transition-colors"
-              >
-                Platform
-              </button>
-              <button
-                onClick={() => scrollToSection("how-it-works")}
-                className="text-gray-600 hover:text-adbox-primary transition-colors"
-              >
-                How It Works
-              </button>
-              <button
-                onClick={() => scrollToSection("benefits")}
-                className="text-gray-600 hover:text-adbox-primary transition-colors"
-              >
-                Success Stories
-              </button>
-              <div className="flex items-center space-x-3">
+              {["Platform", "How It Works", "Success Stories"].map((item) => (
+                <button
+                  key={item}
+                  onClick={() =>
+                    scrollToSection(item.toLowerCase().replace(" ", "-"))
+                  }
+                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 relative group"
+                >
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
+                </button>
+              ))}
+              <div className="flex items-center space-x-4">
                 <Link
                   href="/signin"
-                  className="text-gray-600 hover:text-adbox-primary transition-colors font-medium"
+                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 font-medium"
                 >
                   Sign In
                 </Link>
+                {/* <button className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 font-medium">
+                  Sign In
+                </button> */}
                 <Link
                   href="/signup"
-                  className="bg-gradient-primary text-white px-6 py-2 rounded-full hover:opacity-90 hover:scale-105 transition-all duration-300 transform font-medium"
+                  className="gradient-animated text-white px-8 py-3 rounded-full hover:scale-105 transition-all duration-300 transform font-medium shadow-lg hover:shadow-xl glow-effect"
                 >
-                  Sign Up
+                  Start Campaign
                 </Link>
+                {/* <button 
+                className="gradient-animated text-white px-8 py-3 rounded-full hover:scale-105 transition-all duration-300 transform font-medium shadow-lg hover:shadow-xl glow-effect">
+                  Start Campaign
+                </button> */}
               </div>
             </div>
 
@@ -99,7 +349,7 @@ export default function Home() {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600"
+                className="text-white p-2 rounded-lg backdrop-blur-glass hover:scale-110 transition-transform"
               >
                 {isMenuOpen ? (
                   <X className="w-6 h-6" />
@@ -112,39 +362,26 @@ export default function Home() {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-100 py-4">
+            <div className="md:hidden backdrop-blur-glass border-t border-white/20 py-6 slide-up-animation">
               <div className="flex flex-col space-y-4">
-                <button
-                  onClick={() => scrollToSection("features")}
-                  className="text-gray-600 hover:text-adbox-primary transition-colors text-left px-4"
-                >
-                  Platform
-                </button>
-                <button
-                  onClick={() => scrollToSection("how-it-works")}
-                  className="text-gray-600 hover:text-adbox-primary transition-colors text-left px-4"
-                >
-                  How It Works
-                </button>
-                <button
-                  onClick={() => scrollToSection("benefits")}
-                  className="text-gray-600 hover:text-adbox-primary transition-colors text-left px-4"
-                >
-                  Success Stories
-                </button>
-                <div className="px-4 space-y-3">
-                  <Link
-                    href="/signin"
-                    className="block w-full text-gray-600 hover:text-adbox-primary transition-colors font-medium text-left"
+                {["Platform", "How It Works", "Success Stories"].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() =>
+                      scrollToSection(item.toLowerCase().replace(" ", "-"))
+                    }
+                    className="text-white/80 hover:text-white transition-colors text-left px-4 py-2 hover:bg-white/10 rounded-lg"
                   >
+                    {item}
+                  </button>
+                ))}
+                <div className="px-4 space-y-3 pt-4 border-t border-white/20">
+                  <button className="block w-full text-white/80 hover:text-white transition-colors font-medium text-left py-2">
                     Sign In
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="block w-full bg-gradient-primary text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity font-medium text-center"
-                  >
-                    Sign Up
-                  </Link>
+                  </button>
+                  <button className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg">
+                    Start Campaign
+                  </button>
                 </div>
               </div>
             </div>
@@ -153,249 +390,306 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 bg-gradient-primary text-white overflow-hidden relative">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src={ghanaCity}
-            alt="Ghana digital cityscape showcasing mobile-first digital economy"
-            className="w-full h-full object-cover opacity-75 transform scale-105 animate-fade-in brightness-75"
-          />
-          <div className="absolute inset-0 bg-gradient-primary/75"></div>
-          {/* Additional overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-adbox-primary/90 via-adbox-primary/70 to-adbox-secondary/90"></div>
+      <section
+        ref={heroRef}
+        className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white overflow-hidden relative flex items-center"
+      >
+        {/* Animated Background */}
+        <div className="absolute inset-0" ref={parallaxRef}>
+          <div className="parallax-element absolute top-20 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="parallax-element absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+          <div
+            className="parallax-element absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-full blur-3xl animate-spin"
+            style={{ animationDuration: "20s" }}
+          ></div>
+
+          {/* Floating particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 2}s`,
+              }}
+            ></div>
+          ))}
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up text-zinc-50">
+              <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 mb-8 slide-up-animation">
+                <Globe className="w-4 h-4 mr-2 text-green-400" />
+                <span className="text-sm">Now Live in Ghana</span>
+              </div>
+
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-8 slide-up-animation">
                 Reach Ghana's
                 <br />
-                <span className="text-gray-100 animate-pulse">
-                  50,000+ Mobile Users
+                <span className="text-gradient animate-pulse text-6xl sm:text-7xl lg:text-8xl">
+                  50,000+
                 </span>
                 <br />
-                with Precision
+                Mobile Users
               </h1>
-              <p className="text-xl text-stone-100 mb-8 max-w-lg mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
+
+              <p className="text-xl text-white/80 mb-10 max-w-lg mx-auto lg:mx-0 slide-up-animation animation-delay-200">
                 The most effective digital advertising platform for brands
                 targeting Ghana's engaged mobile audience. Launch campaigns that
-                convert.
+                convert in 24 hours.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-400">
-                <button className="bg-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-purple-700 hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl">
-                  <Briefcase className="w-5 h-5" />
-                  <span>Launch Campaign</span>
-                </button>
-                <button className="border-2 border-purple-500 text-purple-600 bg-white/90 backdrop-blur-sm px-8 py-4 rounded-full font-semibold hover:bg-purple-500 hover:text-white hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-2">
-                  <Video className="w-5 h-5" />
-                  <span>View Demo</span>
-                </button>
+
+              <div className="flex flex-col items-center sm:flex-row gap-6 justify-center lg:justify-start slide-up-animation animation-delay-400">
+                {/* New Download App Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <a
+                    href="https://apps.apple.com/app/adbox/id123456789" // Replace with actual App Store link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative border-2 border-gray-200/20 bg-white/10 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold text-base tracking-tight hover:bg-white/20 hover:border-gray-200/40 transition-all duration-300 ease-in-out transform flex items-center justify-center space-x-3 shadow-md hover:shadow-lg"
+                  >
+                    <span className="sm:inline">Download for iOS</span>
+                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  </a>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.adbox.app" // Replace with actual Google Play link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative border-2 border-gray-200/20 bg-white/10 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold text-base tracking-tight hover:bg-white/20 hover:border-gray-200/40 transition-all duration-300 ease-in-out transform flex items-center justify-center space-x-3 shadow-md hover:shadow-lg"
+                  >
+                    <span className="sm:inline">Download for Android</span>
+                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Live metrics */}
+              <div className="grid grid-cols-3 gap-6 mt-16 slide-up-animation animation-delay-600">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-400 mb-1">
+                    95%
+                  </div>
+                  <div className="text-sm text-white/60">Completion Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-400 mb-1">
+                    ₵0.65
+                  </div>
+                  <div className="text-sm text-white/60">Cost Per View</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-400 mb-1">
+                    24hr
+                  </div>
+                  <div className="text-sm text-white/60">Launch Time</div>
+                </div>
               </div>
             </div>
 
-            <div className="relative">
-              {/* Smartphone mockup */}
-              <div className="relative mx-auto w-64 h-96 bg-gray-900 rounded-3xl p-2 shadow-2xl">
-                <div className="w-full h-full bg-white rounded-2xl overflow-hidden">
-                  {/* Status bar */}
-                  <div className="bg-gradient-primary h-2 w-full"></div>
-                  {/* App content mockup */}
-                  <div className="p-4 space-y-4">
-                    <div className="text-center animate-pulse">
-                      <div className="text-sm font-semibold text-gray-800">
-                        Live Campaign Analytics
+            <div className="relative slide-up-animation animation-delay-300">
+              {/* 3D Phone Mockup */}
+              <div className="relative mx-auto w-80 h-[600px] perspective-1000">
+                <div
+                  className="relative w-full h-full bg-gradient-to-b from-gray-800 to-black rounded-[3rem] p-3 shadow-2xl hover:scale-105 transition-all duration-500 transform hover:rotate-y-12"
+                  style={{ boxShadow: "0 50px 100px rgba(0,0,0,0.3)" }}
+                >
+                  <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative">
+                    {/* Status bar */}
+                    <div className="gradient-animated h-3 w-full"></div>
+
+                    {/* Screen content */}
+                    <div className="p-6 space-y-6 bg-gradient-to-b from-purple-50 to-blue-50">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-gray-800 mb-2">
+                          Live Campaign Analytics
+                        </div>
+                        {/* <div className="text-4xl font-bold text-green-600 mb-1 animate-bounce">
+                          ₵12,450
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Monthly Revenue
+                        </div> */}
                       </div>
-                      {/* <div className="text-2xl font-bold text-green-600 animate-bounce">
-                        ₵12,450
-                      </div> */}
-                      <div className="text-xs text-gray-500">
-                        Monthly Ad Spend
+
+                      {/* Ad preview */}
+                      <div className="relative bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl h-40 flex items-center justify-center overflow-hidden group">
+                        <div className="absolute inset-0 bg-black/20"></div>
+                        <Play className="text-white w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:scale-110 transition-transform z-10" />
+
+                        <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse">
+                          LIVE
+                        </div>
+                        <div className="absolute bottom-3 right-3 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                          95% CTR
+                        </div>
+
+                        {/* Animated wave overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-300 to-pink-300 opacity-60">
+                          <div className="h-full bg-white/30 animate-pulse"></div>
+                        </div>
                       </div>
-                    </div>
-                    {/* Ad preview mockup */}
-                    <div className="bg-gradient-light rounded-lg h-32 flex items-center justify-center relative animate-pulse">
-                      <Play className="text-adbox-primary w-8 h-8 bg-white/90 rounded-full p-2 hover:scale-110 transition-transform" />
-                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
-                        LIVE
-                      </div>
-                      <div className="absolute bottom-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
-                        95% CTR
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-xs font-medium text-gray-800">
-                        MTN Ghana Business Solutions
-                      </div>
-                      <div className="bg-purple-100 rounded-lg p-3 animate-fade-in">
-                        <div className="text-xs text-purple-800">
-                          2,847 views • 94% completion • ₵0.85 CPV
+
+                      {/* Campaign stats */}
+                      <div className="bg-white rounded-2xl p-4 shadow-lg">
+                        <div className="text-sm font-semibold text-gray-800 mb-3">
+                          MTN Ghana Campaign
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600">Views</span>
+                            <span className="text-sm font-bold text-purple-600">
+                              2,847
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600">
+                              Completion
+                            </span>
+                            <span className="text-sm font-bold text-green-600">
+                              94%
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600">
+                              Cost/View
+                            </span>
+                            <span className="text-sm font-bold text-blue-600">
+                              ₵0.85
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress bar */}
+                        <div className="mt-4 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full animate-pulse"
+                            style={{ width: "94%" }}
+                          ></div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Floating stats around phone */}
+                <FloatingCard delay={0}>
+                  <div className="absolute -top-8 -left-8 bg-white rounded-2xl p-4 shadow-xl border border-purple-100">
+                    <div className="text-2xl font-bold text-purple-600">
+                      85%
+                    </div>
+                    <div className="text-xs text-gray-600">CTR</div>
+                  </div>
+                </FloatingCard>
+
+                {/* <FloatingCard delay={1}>
+                  <div className="absolute top-20 -right-12 bg-white rounded-2xl p-4 shadow-xl border border-green-100">
+                    <div className="text-2xl font-bold text-green-600">
+                      ₵0.75
+                    </div>
+                    <div className="text-xs text-gray-600">CPV</div>
+                  </div>
+                </FloatingCard> */}
+
+                <FloatingCard delay={2}>
+                  <div className="absolute bottom-20 -left-12 bg-white rounded-2xl p-4 shadow-xl border border-blue-100">
+                    <div className="text-2xl font-bold text-blue-600">2.5M</div>
+                    <div className="text-xs text-gray-600">Reach</div>
+                  </div>
+                </FloatingCard>
               </div>
-              {/* Floating elements */}
-              {/* <div className="absolute -top-4 -left-4 bg-yellow-300 text-adbox-primary px-3 py-2 rounded-full text-sm font-bold animate-bounce hover:scale-110 transition-transform cursor-pointer">
-                85% CTR
-              </div> */}
-              <div className="absolute top-20 -right-8 bg-green-400 text-white px-3 py-2 rounded-full text-sm font-bold animate-pulse hover:scale-110 transition-transform cursor-pointer">
-                ₵0.75 CPV
-              </div>
-              {/* <div className="absolute bottom-8 -left-6 bg-blue-500 text-white px-3 py-2 rounded-full text-sm font-bold animate-bounce animation-delay-500 hover:scale-110 transition-transform cursor-pointer">
-                2.5M Reach
-              </div> */}
             </div>
           </div>
         </div>
 
-        {/* Wave decoration */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" className="w-full h-20 text-white">
-            <path
-              fill="currentColor"
-              d="M0,0 C240,60 480,60 720,30 C960,0 1200,0 1440,30 L1440,120 L0,120 Z"
-            ></path>
-          </svg>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 animate-bounce">
+          <ChevronDown className="w-8 h-8" />
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in">
-              <div className="text-3xl font-bold text-adbox-primary mb-2 animate-count-up">
-                1,200+
-              </div>
-              <div className="text-gray-600">Active Publishers</div>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in animation-delay-200">
-              <div className="text-3xl font-bold text-green-600 mb-2 animate-count-up">
-                ₵45M+
-              </div>
-              <div className="text-gray-600">Ad Spend Processed</div>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in animation-delay-400">
-              <div className="text-3xl font-bold text-adbox-secondary mb-2 animate-count-up">
-                92%
-              </div>
-              <div className="text-gray-600">Average Completion Rate</div>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in animation-delay-600">
-              <div className="text-3xl font-bold text-purple-600 mb-2 animate-count-up">
-                ₵0.65
-              </div>
-              <div className="text-gray-600">Average Cost Per View</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Publisher Dashboard Video Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Real-Time Campaign Analytics
-              </h2>
-              <p className="text-xl text-gray-600 mb-8">
-                Monitor your campaign performance with our comprehensive
-                analytics dashboard. Track completion rates, demographics, and
-                ROI in real-time.
-              </p>
-              <div className="bg-gradient-primary text-white px-6 py-3 rounded-lg mb-6 inline-block">
-                <div className="flex items-center space-x-2">
-                  <Play className="w-5 h-5" />
-                  <span className="font-semibold">
-                    Watch live dashboard demo
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <span className="text-gray-700">
-                    Live campaign monitoring
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <span className="text-gray-700">
-                    Detailed audience demographics
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <span className="text-gray-700">
-                    Instant performance optimization
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative animate-fade-in-up animation-delay-200">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 group cursor-pointer">
-                <img
-                  src={publisherImage}
-                  alt="Publisher viewing Adbox analytics dashboard showing campaign performance metrics"
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
-
-                {/* Video Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform duration-300">
-                    <Play className="text-adbox-primary w-8 h-8 ml-1" />
-                  </div>
-                </div>
-
-                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  LIVE CAMPAIGN
-                </div>
-                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg group-hover:bg-white transition-colors duration-300">
-                  <div className="text-sm font-semibold text-gray-800">
-                    ₵12,450 Revenue
-                  </div>
-                  <div className="text-xs text-gray-600">This Month</div>
-                </div>
-
-                {/* Video indicator */}
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  <span>LIVE DEMO</span>
-                </div>
-              </div>
-
-              {/* Floating stats */}
-              <div className="absolute -top-6 -right-6 bg-white rounded-xl p-4 shadow-lg animate-bounce hover:scale-110 transition-transform cursor-pointer">
-                <div className="text-lg font-bold text-green-600">95%</div>
-                <div className="text-xs text-gray-600">Completion</div>
-              </div>
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-lg animate-bounce animation-delay-300 hover:scale-110 transition-transform cursor-pointer">
-                <div className="text-lg font-bold text-adbox-primary">
-                  ₵0.65
-                </div>
-                <div className="text-xs text-gray-600">Cost/View</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-fade-in-up">
+      <section
+        id="stats-section"
+        className="py-20 bg-white relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Platform Performance
+            </h2>
+            <p className="text-xl text-gray-600">
+              Real numbers from our advertising ecosystem
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              {
+                value: Math.round(animatedStats.publishers),
+                suffix: "+",
+                label: "Active Publishers",
+                color: "purple",
+                icon: Users,
+              },
+              {
+                value: "₵",
+                suffix: `${Math.round(animatedStats.adSpend)}M+`,
+                label: "Ad Spend Processed",
+                color: "green",
+                icon: TrendingUp,
+              },
+              {
+                value: Math.round(animatedStats.completion),
+                suffix: "%",
+                label: "Average Completion Rate",
+                color: "blue",
+                icon: Target,
+              },
+              {
+                value: "₵0.",
+                suffix: Math.round(animatedStats.costPerView),
+                label: "Average Cost Per View",
+                color: "pink",
+                icon: Zap,
+              },
+            ].map((stat, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-3xl p-8 shadow-lg hover-lift border border-gray-100 text-center group"
+              >
+                <div
+                  className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-${stat.color}-100 flex items-center justify-center group-hover:scale-110 transition-transform`}
+                >
+                  <stat.icon className={`w-8 h-8 text-${stat.color}-600`} />
+                </div>
+                <div
+                  className={`text-4xl font-bold text-${stat.color}-600 mb-2`}
+                >
+                  {stat.value}
+                  {stat.suffix}
+                </div>
+                <div className="text-gray-600 font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Features Section - Enhanced Styling */}
+      <section className="py-24 bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-40 h-40 bg-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-60 h-60 bg-pink-200/30 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-100/20 to-pink-100/20 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">
               Why Publishers Choose Adbox
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -403,724 +697,395 @@ export default function Home() {
               audience with guaranteed engagement
             </p>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 animate-fade-in-up">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 animate-pulse">
-                <Briefcase className="text-white w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Precision Targeting
-              </h3>
-              <p className="text-gray-600">
-                Target specific demographics, locations, and interests across
-                Ghana. Reach exactly who you want with advanced audience
-                segmentation.
-              </p>
-            </div>
+            {[
+              {
+                icon: Target,
+                title: "Precision Targeting",
+                desc: "Target specific demographics, locations, and interests across Ghana with advanced audience segmentation.",
+                color: "purple",
+              },
+              {
+                icon: Award,
+                title: "Guaranteed Results",
+                desc: "92% average completion rate with engaged audiences. Pay only for verified views and meaningful engagement.",
+                color: "red",
+              },
+              {
+                icon: Shield,
+                title: "Transparent Analytics",
+                desc: "Real-time campaign analytics, completion rates, audience insights, and ROI tracking for all campaigns.",
+                color: "blue",
+              },
+              {
+                icon: Video,
+                title: "Premium Ad Formats",
+                desc: "Video ads, interactive surveys, product demos, and branded content optimized for mobile engagement.",
+                color: "red",
+              },
+              {
+                icon: Users,
+                title: "Audience Targeting",
+                desc: "Target specific demographics, interests, and locations across Ghana for maximum campaign effectiveness.",
+                color: "blue",
+              },
+              {
+                icon: Smartphone,
+                title: "Mobile-First Platform",
+                desc: "Optimized for Ghana's mobile-first audience with seamless experience across all network conditions.",
+                color: "purple",
+              },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className={`feature-card group bg-white rounded-3xl p-8 shadow-lg hover-lift border border-gray-100 relative overflow-hidden slide-up-animation ${
+                  index % 2 === 0
+                    ? "animation-delay-200"
+                    : "animation-delay-400"
+                }`}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform =
+                    "translateY(-12px) scale(1.03)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform =
+                    "translateY(0) scale(1)";
+                }}
+              >
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br from-${feature.color}-50 to-${feature.color}-100 opacity-0 group-hover:opacity-100 transition-all duration-700`}
+                ></div>
 
-            {/* Feature 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 animate-fade-in-up animation-delay-200">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 animate-pulse animation-delay-200">
-                <Coins className="text-white w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Guaranteed Results
-              </h3>
-              <p className="text-gray-600">
-                92% average completion rate with engaged audiences. Pay only for
-                verified views and meaningful engagement with your brand.
-              </p>
-            </div>
+                <div
+                  className={`relative w-20 h-20 bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 shadow-lg hover:shadow-2xl`}
+                >
+                  <feature.icon className="text-white w-10 h-10" />
+                </div>
 
-            {/* Feature 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
-                <Shield className="text-white w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Transparent Analytics
-              </h3>
-              <p className="text-gray-600">
-                Real-time campaign analytics, completion rates, audience
-                insights, and ROI tracking for all your advertising campaigns.
-              </p>
-            </div>
+                <h3 className="relative text-2xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-all duration-300">
+                  {feature.title}
+                </h3>
+                <p className="relative text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                  {feature.desc}
+                </p>
 
-            {/* Feature 4 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
-                <Video className="text-white w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Premium Ad Formats
-              </h3>
-              <p className="text-gray-600">
-                Video ads, interactive surveys, product demos, and branded
-                content optimized for mobile engagement.
-              </p>
-            </div>
+                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
+                  <ArrowRight className={`w-6 h-6 text-${feature.color}-500`} />
+                </div>
 
-            {/* Feature 5 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
-                <Users className="text-white w-8 h-8" />
+                {/* Shimmer overlay on hover */}
+                <div className="absolute inset-0 feature-card-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Audience Targeting
-              </h3>
-              <p className="text-gray-600">
-                Target specific demographics, interests, and locations across
-                Ghana for maximum campaign effectiveness.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
-                <Smartphone className="text-white w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Mobile-First Platform
-              </h3>
-              <p className="text-gray-600">
-                Optimized for Ghana's mobile-first audience with seamless
-                experience across all network conditions.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-gradient-light">
+      {/* Interactive Success Stories Carousel */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How Adbox Works
-            </h2>
-            <p className="text-xl text-gray-600">
-              A simple ecosystem connecting Publishers and Viewers
-            </p>
-          </div>
-
-          {/* Publisher Process */}
-          <div className="max-w-4xl mx-auto mb-16">
-            <div className="bg-white rounded-2xl p-8 shadow-xl animate-fade-in-up">
-              <div className="text-center mb-8">
-                <div className="w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <Briefcase className="text-white w-10 h-10" />
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                  Launch Your Campaign in 4 Steps
-                </h3>
-                <p className="text-gray-600">
-                  Get your ads in front of 50,000+ engaged users today
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-start space-x-4 hover:bg-gray-50 p-4 rounded-xl transition-colors duration-300">
-                  <div className="w-10 h-10 bg-adbox-primary rounded-full flex items-center justify-center mt-1 animate-bounce">
-                    <span className="text-white text-lg font-bold">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-lg mb-2">
-                      Set Your Budget
-                    </h4>
-                    <p className="text-gray-600">
-                      Start with as little as ₵100. Pay only for verified views
-                      and engagement.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4 hover:bg-gray-50 p-4 rounded-xl transition-colors duration-300">
-                  <div className="w-10 h-10 bg-adbox-primary rounded-full flex items-center justify-center mt-1 animate-bounce animation-delay-200">
-                    <span className="text-white text-lg font-bold">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-lg mb-2">
-                      Upload Creative
-                    </h4>
-                    <p className="text-gray-600">
-                      Video ads, surveys, or product demos. Our team helps
-                      optimize for mobile.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4 hover:bg-gray-50 p-4 rounded-xl transition-colors duration-300">
-                  <div className="w-10 h-10 bg-adbox-primary rounded-full flex items-center justify-center mt-1 animate-bounce animation-delay-400">
-                    <span className="text-white text-lg font-bold">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-lg mb-2">
-                      Target Precisely
-                    </h4>
-                    <p className="text-gray-600">
-                      Choose age, location, interests, and device types across
-                      all 16 regions of Ghana.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4 hover:bg-gray-50 p-4 rounded-xl transition-colors duration-300">
-                  <div className="w-10 h-10 bg-adbox-primary rounded-full flex items-center justify-center mt-1 animate-bounce animation-delay-600">
-                    <span className="text-white text-lg font-bold">4</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-lg mb-2">
-                      Track & Optimize
-                    </h4>
-                    <p className="text-gray-600">
-                      Real-time analytics dashboard shows completion rates,
-                      demographics, and ROI.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Performance Guarantee */}
-          <div className="text-center animate-fade-in-up animation-delay-800">
-            <div className="inline-flex items-center space-x-6 bg-gradient-primary text-white rounded-2xl px-12 py-6 shadow-xl hover:scale-105 transition-transform duration-300">
-              <div className="text-center">
-                <div className="text-2xl font-bold">92%</div>
-                <div className="text-sm opacity-90">Completion Rate</div>
-              </div>
-              <div className="w-px h-12 bg-white/30"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">₵0.65</div>
-                <div className="text-sm opacity-90">Avg Cost Per View</div>
-              </div>
-              <div className="w-px h-12 bg-white/30"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">24hrs</div>
-                <div className="text-sm opacity-90">Campaign Launch</div>
-              </div>
-            </div>
-            <p className="text-gray-600 mt-6 max-w-2xl mx-auto">
-              Your advertising budget reaches verified users who are
-              incentivized to engage completely with your content.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Campaign Showcase Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">
               Success Stories
             </h2>
             <p className="text-xl text-gray-600">
               See how leading brands are reaching Ghana's mobile audience
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Success Story 1 - MTN */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 animate-fade-in-up">
-              <div className="relative h-48 bg-gradient-to-r from-yellow-400 to-red-500 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-3xl font-bold mb-2">95%</div>
-                    <div className="text-sm">Completion Rate</div>
+
+          <div className="relative">
+            <div className="overflow-hidden rounded-3xl">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {[
+                  {
+                    company: "MTN Ghana",
+                    metric: "95%",
+                    metricLabel: "Completion Rate",
+                    bg: "from-yellow-400 to-red-500",
+                    results: "Reached 25,000+ users with 95% completion rate",
+                    roi: "+340% ROI",
+                  },
+                  {
+                    company: "Vodafone",
+                    metric: "₵18K",
+                    metricLabel: "Revenue Generated",
+                    bg: "from-red-500 to-pink-500",
+                    results: "Increased app downloads by 280% in 2 months",
+                    roi: "+280% Downloads",
+                  },
+                  {
+                    company: "GhanaPost GPS",
+                    metric: "12K",
+                    metricLabel: "New Signups",
+                    bg: "from-blue-500 to-green-500",
+                    results: "Generated 12,000+ new app signups in 30 days",
+                    roi: "+450% Signups",
+                  },
+                ].map((story, index) => (
+                  <div key={index} className="w-full flex-shrink-0">
+                    <div
+                      className={`bg-gradient-to-br ${story.bg} rounded-3xl p-12 text-white relative overflow-hidden`}
+                    >
+                      <div className="absolute inset-0 bg-black/20"></div>
+                      <div className="relative z-10">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                          <div>
+                            <h3 className="text-4xl font-bold mb-4">
+                              {story.company}
+                            </h3>
+                            <p className="text-xl mb-6 text-white/90">
+                              {story.results}
+                            </p>
+                            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+                              <TrendingUp className="w-5 h-5 mr-2" />
+                              <span className="font-semibold">{story.roi}</span>
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-6xl font-bold mb-2">
+                              {story.metric}
+                            </div>
+                            <div className="text-xl text-white/80">
+                              {story.metricLabel}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Animated background elements */}
+                      <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                      <div className="absolute bottom-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-2xl animate-pulse animation-delay-1000"></div>
+                    </div>
                   </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  MTN Ghana
-                </div>
-                <div className="absolute bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  ₵0.65 CPV
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-bold text-gray-900 mb-2">
-                  Data Plan Campaign Success
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  Reached 25,000+ users with 95% completion rate
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    3 month campaign
-                  </span>
-                  <span className="text-green-600 font-semibold text-sm">
-                    +340% ROI
-                  </span>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Success Story 2 - Vodafone */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 animate-fade-in-up animation-delay-200">
-              <div className="relative h-48 bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-3xl font-bold mb-2">₵18K</div>
-                    <div className="text-sm">Revenue Generated</div>
-                  </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  Vodafone
-                </div>
-                <div className="absolute bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  ₵0.70 CPV
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-bold text-gray-900 mb-2">
-                  Mobile Money Campaign
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  Increased app downloads by 280% in 2 months
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    2 month campaign
-                  </span>
-                  <span className="text-green-600 font-semibold text-sm">
-                    +280% Downloads
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Success Story 3 - Local Business */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 animate-fade-in-up animation-delay-400">
-              <div className="relative h-48 bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-3xl font-bold mb-2">12K</div>
-                    <div className="text-sm">New Signups</div>
-                  </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  GhanaPost GPS
-                </div>
-                <div className="absolute bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  ₵0.58 CPV
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-bold text-gray-900 mb-2">
-                  Digital Address Awareness
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  12,000+ new GPS address registrations
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">6 week campaign</span>
-                  <span className="text-green-600 font-semibold text-sm">
-                    +450% Awareness
-                  </span>
-                </div>
-              </div>
+            {/* Carousel indicators */}
+            <div className="flex justify-center mt-8 space-x-3">
+              {[0, 1, 2].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    currentSlide === index ? "bg-purple-500 w-8" : "bg-gray-300"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section id="benefits" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Publishers Choose Adbox
-            </h2>
-            <p className="text-xl text-gray-600">
-              The most effective way to reach Ghana's engaged mobile audience
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Benefit 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <Users className="text-green-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Engaged Audience
-              </h3>
-              <p className="text-gray-600">
-                Reach 50,000+ active users who are incentivized to watch your
-                ads completely, ensuring high completion rates.
-              </p>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-                <Shield className="text-blue-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Fraud Protection
-              </h3>
-              <p className="text-gray-600">
-                Advanced verification ensures real users and genuine engagement,
-                protecting your ad spend from fake views.
-              </p>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
-                <Smartphone className="text-purple-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Mobile-First
-              </h3>
-              <p className="text-gray-600">
-                Perfect for Ghana's mobile-first market with optimized
-                experiences across all network conditions.
-              </p>
-            </div>
-
-            {/* Benefit 4 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-6">
-                <Clock className="text-yellow-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Real-Time Analytics
-              </h3>
-              <p className="text-gray-600">
-                Monitor campaign performance, audience demographics, and ROI
-                with live dashboards and detailed insights.
-              </p>
-            </div>
-
-            {/* Benefit 5 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-6">
-                <Coins className="text-red-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Cost Effective
-              </h3>
-              <p className="text-gray-600">
-                Lower cost per view compared to Facebook and Google Ads while
-                reaching highly engaged local audiences.
-              </p>
-            </div>
-
-            {/* Benefit 6 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <Video className="text-green-600 w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Multiple Formats
-              </h3>
-              <p className="text-gray-600">
-                Support for video ads, interactive surveys, product demos, and
-                branded content to maximize engagement.
-              </p>
-            </div>
-          </div>
-
-          {/* Call-to-Action */}
-          <div className="text-center mt-16">
-            <div className="bg-white rounded-2xl p-8 shadow-lg max-w-3xl mx-auto">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Ready to Start Advertising?
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Join 500+ publishers already reaching Ghana's most engaged
-                audience through Adbox.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="bg-gradient-primary text-white px-8 py-4 rounded-full font-semibold hover:opacity-90 transition-opacity">
-                  Start Your Campaign
-                </button>
-                <button className="border-2 border-adbox-primary text-adbox-primary px-8 py-4 rounded-full font-semibold hover:bg-adbox-primary hover:text-white transition-colors">
-                  View Pricing
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* How It Works Section */}
+      <section
+        id="how-it-works"
+        className="py-24 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden"
+      >
+        <div className="absolute inset-0">
+          <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
         </div>
-      </section>
 
-      {/* Publisher Testimonials Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              What Publishers Are Saying
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold mb-6">
+              Launch in 3 Simple Steps
             </h2>
-            <p className="text-xl text-gray-600">
-              Real results from brands using Adbox
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Start reaching Ghana's mobile audience in just 24 hours with our
+              streamlined campaign process
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Publisher Testimonial 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">KA</span>
-                </div>
-                <div className="ml-4">
-                  <div className="font-bold text-gray-900">Kofi Asante</div>
-                  <div className="text-sm text-gray-600">
-                    Marketing Director, MTN Ghana
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "Adbox gave us 95% completion rates and ₵0.65 cost per view.
-                Best ROI we've seen compared to Facebook and Google Ads."
-              </p>
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-            </div>
 
-            {/* Publisher Testimonial 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up animation-delay-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">AM</span>
-                </div>
-                <div className="ml-4">
-                  <div className="font-bold text-gray-900">Ama Mensah</div>
-                  <div className="text-sm text-gray-600">
-                    Brand Manager, Vodafone Ghana
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              {
+                step: "01",
+                icon: Target,
+                title: "Define Your Audience",
+                desc: "Choose demographics, interests, and locations across Ghana. Our AI helps optimize targeting for maximum engagement.",
+              },
+              {
+                step: "02",
+                icon: Video,
+                title: "Create Your Campaign",
+                desc: "Upload your video ad, set your budget, and customize your campaign settings. Our team provides creative support.",
+              },
+              {
+                step: "03",
+                icon: BarChart3,
+                title: "Launch & Optimize",
+                desc: "Go live in 24 hours and track real-time performance. Optimize campaigns based on detailed analytics and insights.",
+              },
+            ].map((item, index) => (
+              <div key={index} className="relative group">
+                <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 hover:scale-105 border border-white/20">
+                  <div className="flex items-center mb-6">
+                    <div className="text-6xl font-bold text-purple-400 mr-4">
+                      {item.step}
+                    </div>
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center">
+                      <item.icon className="w-8 h-8 text-white" />
+                    </div>
                   </div>
+                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                  <p className="text-white/80 leading-relaxed">{item.desc}</p>
                 </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "We reached 18,000+ users and increased mobile money signups by
-                280%. The targeting is incredibly precise for the Ghanaian
-                market."
-              </p>
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-            </div>
 
-            {/* Publisher Testimonial 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up animation-delay-400">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">KO</span>
-                </div>
-                <div className="ml-4">
-                  <div className="font-bold text-gray-900">Kwame Osei</div>
-                  <div className="text-sm text-gray-600">
-                    Founder, Ghana Startup Hub
-                  </div>
-                </div>
+                {/* Connection line */}
+                {index < 2 && (
+                  <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-purple-400 to-transparent"></div>
+                )}
               </div>
-              <p className="text-gray-700 mb-4">
-                "As a local startup, Adbox gave us access to engaged Ghanaian
-                users at costs we could afford. Generated 450% increase in brand
-                awareness."
-              </p>
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section
-        id="download"
-        className="py-20 bg-gradient-primary text-white relative overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-black/20"></div>
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50"></div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 animate-fade-in-up">
-            Ready to Launch Your Campaign?
+          <div className="inline-flex items-center bg-purple-100 text-purple-800 rounded-full px-6 py-2 mb-8">
+            <Zap className="w-4 h-4 mr-2" />
+            <span className="text-sm font-semibold">
+              Limited Time: No Setup Fees
+            </span>
+          </div>
+
+          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+            Ready to Reach Ghana's Mobile Audience?
           </h2>
-          <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto animate-fade-in-up animation-delay-200">
-            Join 1,200+ publishers already reaching Ghana's most engaged mobile
-            audience. Launch your first campaign today with as little as ₵100.
+          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            Join 1,200+ publishers already earning with Adbox. Launch your first
+            campaign today and see results in 24 hours.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up animation-delay-400">
-            <button className="bg-white text-adbox-primary px-8 py-4 rounded-full font-semibold hover:bg-gray-100 hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3 shadow-xl">
-              <Briefcase className="w-6 h-6" />
-              <div className="text-left">
-                <div className="text-sm">Start Your</div>
-                <div className="text-lg font-bold">Campaign Today</div>
-              </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
+            <button className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-6 rounded-2xl font-semibold hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <Briefcase className="w-6 h-6 relative z-10" />
+              <span className="relative z-10 text-lg">Start Campaign Now</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
             </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-adbox-primary hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3">
-              <Video className="w-6 h-6" />
-              <div className="text-left">
-                <div className="text-sm">Watch</div>
-                <div className="text-lg font-bold">Platform Demo</div>
-              </div>
+
+            <button className="group border-2 border-purple-200 text-purple-600 px-12 py-6 rounded-2xl font-semibold hover:scale-105 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 transform flex items-center justify-center space-x-3">
+              <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <span className="text-lg">Schedule Demo</span>
             </button>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm animate-fade-in-up animation-delay-600">
-            <h3 className="text-2xl font-bold mb-6">Platform Performance</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div className="hover:scale-105 transition-transform duration-300">
-                <div className="text-4xl font-bold text-yellow-300 mb-2 animate-count-up">
-                  92%
-                </div>
-                <div className="text-purple-100">Average completion rate</div>
-              </div>
-              <div className="hover:scale-105 transition-transform duration-300">
-                <div className="text-4xl font-bold text-yellow-300 mb-2 animate-count-up">
-                  ₵0.65
-                </div>
-                <div className="text-purple-100">Average cost per view</div>
-              </div>
-              <div className="hover:scale-105 transition-transform duration-300">
-                <div className="text-4xl font-bold text-yellow-300 mb-2 animate-count-up">
-                  24hrs
-                </div>
-                <div className="text-purple-100">Campaign launch time</div>
-              </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-gray-500">
+            <div className="flex items-center">
+              <Shield className="w-5 h-5 mr-2 text-green-500" />
+              <span>No Setup Fees</span>
+            </div>
+            <div className="flex items-center">
+              <Clock className="w-5 h-5 mr-2 text-blue-500" />
+              <span>24hr Launch Time</span>
+            </div>
+            <div className="flex items-center">
+              <Award className="w-5 h-5 mr-2 text-purple-500" />
+              <span>92% Success Rate</span>
             </div>
           </div>
-
-          <p className="text-purple-200 mt-8 text-lg animate-fade-in-up animation-delay-800">
-            No setup fees • No minimum spend • Cancel anytime
-          </p>
         </div>
-
-        {/* Floating animation elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-16 h-16 bg-white/10 rounded-full animate-float animation-delay-400"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 bg-white/10 rounded-full animate-float animation-delay-600"></div>
       </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <Play className="text-white w-4 h-4" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-12 h-12 gradient-animated rounded-xl flex items-center justify-center">
+                  <Play className="text-white w-6 h-6" />
                 </div>
-                <span className="font-bold text-xl">Adbox</span>
+                <span className="font-bold text-2xl">Adbox</span>
               </div>
-              <p className="text-gray-400 mb-6">
-                Ghana's premier digital advertising platform connecting brands
-                with engaged mobile audiences.
+              <p className="text-gray-400 mb-6 max-w-md">
+                Ghana's leading digital advertising platform connecting brands
+                with engaged mobile audiences. Reach 50,000+ users with
+                guaranteed results.
               </p>
+              <div className="flex space-x-4">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <Video className="w-5 h-5" />
+                </div>
+              </div>
             </div>
 
-            {/* Quick Links */}
             <div>
-              <h4 className="font-semibold text-lg mb-6">Quick Links</h4>
-              <ul className="space-y-4">
+              <h4 className="font-semibold text-lg mb-6">Platform</h4>
+              <ul className="space-y-4 text-gray-400">
                 <li>
-                  <button
-                    onClick={() => scrollToSection("features")}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Features
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("how-it-works")}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
                     How It Works
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => scrollToSection("benefits")}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Benefits
-                  </button>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Pricing
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => scrollToSection("download")}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Download
-                  </button>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Success Stories
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Analytics
+                  </a>
                 </li>
               </ul>
             </div>
 
-            {/* Support */}
             <div>
               <h4 className="font-semibold text-lg mb-6">Support</h4>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="font-semibold text-lg mb-6">Contact</h4>
               <ul className="space-y-4 text-gray-400">
-                <li className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
+                <li className="flex items-center">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>+233 XX XXX XXXX</span>
+                </li>
+                <li className="flex items-center">
+                  <Mail className="w-4 h-4 mr-2" />
                   <span>hello@adbox.gh</span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4" />
-                  <span>+233 50 123 4567</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <MapPin className="w-4 h-4" />
+                <li className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2" />
                   <span>Accra, Ghana</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>
-              &copy; 2024 Adbox. All rights reserved. Made with ❤️ in Ghana.
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 mb-4 md:mb-0">
+              © 2025 Adbox Ghana. All rights reserved.
             </p>
+            <div className="flex space-x-6 text-gray-400">
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Contact
+              </a>
+            </div>
           </div>
         </div>
       </footer>
