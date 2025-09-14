@@ -376,12 +376,24 @@ export default function ModernAdboxLanding() {
                   </button>
                 ))}
                 <div className="px-4 space-y-3 pt-4 border-t border-white/20">
-                  <button className="block w-full text-white/80 hover:text-white transition-colors font-medium text-left py-2">
+                  <Link
+                    href="/signin"
+                    className="block w-full text-white/80 hover:text-white transition-colors font-medium text-left py-2"
+                  >
                     Sign In
-                  </button>
-                  <button className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg">
+                  </Link>
+
+                  <Link
+                    href="/signup"
+                    className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg"
+                  >
                     Start Campaign
-                  </button>
+                  </Link>
+                  {/* <button 
+                  className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg"
+                  >
+                    Start Campaign
+                  </button> */}
                 </div>
               </div>
             </div>
