@@ -6,7 +6,6 @@ export const Storage = {
     const encryptedData = CryptoJS.AES.encrypt(token, key).toString();
     localStorage.setItem("token", encryptedData);
   },
-
   getToken: () => {
     const encryptedData = localStorage.getItem("token");
     if (encryptedData !== null) {

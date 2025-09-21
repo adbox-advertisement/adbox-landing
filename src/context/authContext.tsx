@@ -40,8 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = response.data;
       if (data?.token) {
         Storage.saveToken(data.token);
-        window.location.href = `${PUBLISHER_DASHBOARD_URL}?token=${data.token}`;
-        // window.location.href = `http://localhost:5174?token=${data.token}`;
+        const publisherData = encodeURIComponent(btoa(JSON.stringify(data)));
+        window.location.href = `${PUBLISHER_DASHBOARD_URL}?token=${data.token}&publisher=${publisherData}`;
       } else {
         setError(data?.message || "Login failed");
       }
