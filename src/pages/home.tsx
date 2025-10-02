@@ -1069,11 +1069,11 @@ export default function ModernAdboxLanding() {
               <ul className="space-y-4 text-gray-400">
                 <li className="flex items-center">
                   <Phone className="w-4 h-4 mr-2" />
-                  <span>+233 XX XXX XXXX</span>
+                  <span>+233 53 889 7225</span>
                 </li>
                 <li className="flex items-center">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span>hello@adbox.gh</span>
+                  <span>info@adboxgh.com</span>
                 </li>
                 <li className="flex items-center">
                   <MapPin className="w-4 h-4 mr-2" />

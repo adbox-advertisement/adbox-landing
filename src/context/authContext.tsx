@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import ApiService from "@/helpers/api.service";
 import { Storage } from "@/helpers/local.storage";
 import { PUBLISHER_DASHBOARD_URL } from "@/helpers/constants";
+import { useToast } from "@/hooks/use-toast";
+
 interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
@@ -27,6 +29,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const { toast } = useToast();
 
   const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
@@ -38,14 +41,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password,
       });
       const data = response.data;
+      // Show success toast
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
       if (data?.token) {
         Storage.saveToken(data.token);
+
         const publisherData = encodeURIComponent(btoa(JSON.stringify(data)));
         window.location.href = `${PUBLISHER_DASHBOARD_URL}?token=${data.token}&publisher=${publisherData}`;
       } else {
         setError(data?.message || "Login failed");
       }
     } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Authentication failed",
+        description: "Invalid email or password.",
+      });
       setError(
         err.response?.data?.message || "Network error. Please try again."
       );
