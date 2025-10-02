@@ -9,7 +9,7 @@ import {
   Briefcase,
   Phone,
   Mail,
-  MapPin,
+  // MapPin,
   Menu,
   X,
   ArrowRight,
@@ -22,6 +22,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Link } from "wouter";
+import SocialPhoneMockup from "@/components/socialMedia/social";
 // Define types for state and props
 interface MousePosition {
   x: number;
@@ -33,11 +34,6 @@ interface AnimatedStats {
   adSpend: number;
   completion: number;
   costPerView: number;
-}
-
-interface FloatingCardProps {
-  children: React.ReactNode;
-  delay?: number;
 }
 
 export default function ModernAdboxLanding() {
@@ -174,26 +170,12 @@ export default function ModernAdboxLanding() {
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
+
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
     setIsMenuOpen(false);
   };
-
-  const FloatingCard: React.FC<FloatingCardProps> = ({
-    children,
-    delay = 0,
-  }) => (
-    <div
-      className="floating-card"
-      style={{
-        transform: `translateY(${Math.sin(Date.now() * 0.001 + delay) * 10}px)`,
-        animation: `float 6s ease-in-out infinite ${delay}s`,
-      }}
-    >
-      {children}
-    </div>
-  );
 
   return (
     <div className="font-inter text-gray-900 overflow-x-hidden">
@@ -310,13 +292,13 @@ export default function ModernAdboxLanding() {
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              {["Platform", "How It Works", "Success Stories"].map((item) => (
+              {["Process overview", "Success Stories"].map((item) => (
                 <button
                   key={item}
                   onClick={() =>
-                    scrollToSection(item.toLowerCase().replace(" ", "-"))
+                    scrollToSection(item.toLowerCase().replace(" ", "_"))
                   }
-                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 relative group"
+                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 relative group cursor-pointer"
                 >
                   {item}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
@@ -338,10 +320,6 @@ export default function ModernAdboxLanding() {
                 >
                   Start Campaign
                 </Link>
-                {/* <button 
-                className="gradient-animated text-white px-8 py-3 rounded-full hover:scale-105 transition-all duration-300 transform font-medium shadow-lg hover:shadow-xl glow-effect">
-                  Start Campaign
-                </button> */}
               </div>
             </div>
 
@@ -364,11 +342,11 @@ export default function ModernAdboxLanding() {
           {isMenuOpen && (
             <div className="md:hidden backdrop-blur-glass border-t border-white/20 py-6 slide-up-animation">
               <div className="flex flex-col space-y-4">
-                {["Platform", "How It Works", "Success Stories"].map((item) => (
+                {["Process Overview", "Success Stories"].map((item) => (
                   <button
                     key={item}
                     onClick={() =>
-                      scrollToSection(item.toLowerCase().replace(" ", "-"))
+                      scrollToSection(item.toLowerCase().replace(" ", "_"))
                     }
                     className="text-white/80 hover:text-white transition-colors text-left px-4 py-2 hover:bg-white/10 rounded-lg"
                   >
@@ -389,11 +367,6 @@ export default function ModernAdboxLanding() {
                   >
                     Start Campaign
                   </Link>
-                  {/* <button 
-                  className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg"
-                  >
-                    Start Campaign
-                  </button> */}
                 </div>
               </div>
             </div>
@@ -442,7 +415,7 @@ export default function ModernAdboxLanding() {
                 Reach Ghana's
                 <br />
                 <span className="text-gradient animate-pulse text-6xl sm:text-7xl lg:text-8xl">
-                  50,000+
+                  30 Million
                 </span>
                 <br />
                 Mobile Users
@@ -501,118 +474,7 @@ export default function ModernAdboxLanding() {
               </div>
             </div>
 
-            <div className="relative slide-up-animation animation-delay-300">
-              {/* 3D Phone Mockup */}
-              <div className="relative mx-auto w-80 h-[600px] perspective-1000">
-                <div
-                  className="relative w-full h-full bg-gradient-to-b from-gray-800 to-black rounded-[3rem] p-3 shadow-2xl hover:scale-105 transition-all duration-500 transform hover:rotate-y-12"
-                  style={{ boxShadow: "0 50px 100px rgba(0,0,0,0.3)" }}
-                >
-                  <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative">
-                    {/* Status bar */}
-                    <div className="gradient-animated h-3 w-full"></div>
-
-                    {/* Screen content */}
-                    <div className="p-6 space-y-6 bg-gradient-to-b from-purple-50 to-blue-50">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-gray-800 mb-2">
-                          Live Campaign Analytics
-                        </div>
-                        {/* <div className="text-4xl font-bold text-green-600 mb-1 animate-bounce">
-                          ₵12,450
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Monthly Revenue
-                        </div> */}
-                      </div>
-
-                      {/* Ad preview */}
-                      <div className="relative bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl h-40 flex items-center justify-center overflow-hidden group">
-                        <div className="absolute inset-0 bg-black/20"></div>
-                        <Play className="text-white w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:scale-110 transition-transform z-10" />
-
-                        <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse">
-                          LIVE
-                        </div>
-                        <div className="absolute bottom-3 right-3 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
-                          95% CTR
-                        </div>
-
-                        {/* Animated wave overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-300 to-pink-300 opacity-60">
-                          <div className="h-full bg-white/30 animate-pulse"></div>
-                        </div>
-                      </div>
-
-                      {/* Campaign stats */}
-                      <div className="bg-white rounded-2xl p-4 shadow-lg">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">
-                          MTN Ghana Campaign
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600">Views</span>
-                            <span className="text-sm font-bold text-purple-600">
-                              2,847
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600">
-                              Completion
-                            </span>
-                            <span className="text-sm font-bold text-green-600">
-                              94%
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600">
-                              Cost/View
-                            </span>
-                            <span className="text-sm font-bold text-blue-600">
-                              ₵0.85
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Progress bar */}
-                        <div className="mt-4 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full animate-pulse"
-                            style={{ width: "94%" }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating stats around phone */}
-                <FloatingCard delay={0}>
-                  <div className="absolute -top-8 -left-8 bg-white rounded-2xl p-4 shadow-xl border border-purple-100">
-                    <div className="text-2xl font-bold text-purple-600">
-                      85%
-                    </div>
-                    <div className="text-xs text-gray-600">CTR</div>
-                  </div>
-                </FloatingCard>
-
-                {/* <FloatingCard delay={1}>
-                  <div className="absolute top-20 -right-12 bg-white rounded-2xl p-4 shadow-xl border border-green-100">
-                    <div className="text-2xl font-bold text-green-600">
-                      ₵0.75
-                    </div>
-                    <div className="text-xs text-gray-600">CPV</div>
-                  </div>
-                </FloatingCard> */}
-
-                <FloatingCard delay={2}>
-                  <div className="absolute bottom-20 -left-12 bg-white rounded-2xl p-4 shadow-xl border border-blue-100">
-                    <div className="text-2xl font-bold text-blue-600">2.5M</div>
-                    <div className="text-xs text-gray-600">Reach</div>
-                  </div>
-                </FloatingCard>
-              </div>
-            </div>
+            <SocialPhoneMockup />
           </div>
         </div>
 
@@ -795,7 +657,7 @@ export default function ModernAdboxLanding() {
       </section>
 
       {/* Interactive Success Stories Carousel */}
-      <section className="py-24 bg-white">
+      <section id="success_stories" className=" py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 mb-6">
@@ -895,7 +757,7 @@ export default function ModernAdboxLanding() {
 
       {/* How It Works Section */}
       <section
-        id="how-it-works"
+        id="process_overview"
         className="py-24 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden"
       >
         <div className="absolute inset-0">
@@ -905,7 +767,7 @@ export default function ModernAdboxLanding() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold mb-6">
+            <h2 id="" className="text-5xl font-bold mb-6">
               Launch in 3 Simple Steps
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
@@ -979,14 +841,20 @@ export default function ModernAdboxLanding() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-            <button className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-6 rounded-2xl font-semibold hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden">
+            <Link
+              href="/signup"
+              className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-6 rounded-2xl font-semibold hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden"
+            >
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <Briefcase className="w-6 h-6 relative z-10" />
               <span className="relative z-10 text-lg">Start Campaign Now</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
-            </button>
+            </Link>
 
-            <button className="group border-2 border-purple-200 text-purple-600 px-12 py-6 rounded-2xl font-semibold hover:scale-105 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 transform flex items-center justify-center space-x-3">
+            <button
+              onClick={() => scrollToSection("contact")}
+              className="cursor-pointer group border-2 border-purple-200 text-purple-600 px-12 py-6 rounded-2xl font-semibold hover:scale-105 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 transform flex items-center justify-center space-x-3"
+            >
               <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" />
               <span className="text-lg">Schedule Demo</span>
             </button>
@@ -1022,8 +890,8 @@ export default function ModernAdboxLanding() {
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 Ghana's leading digital advertising platform connecting brands
-                with engaged mobile audiences. Reach 50,000+ users with
-                guaranteed results.
+                with engaged mobile audiences. Reach 30M+ users with guaranteed
+                results.
               </p>
               <div className="flex space-x-4">
                 <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
@@ -1041,30 +909,30 @@ export default function ModernAdboxLanding() {
             <div>
               <h4 className="font-semibold text-lg mb-6">Platform</h4>
               <ul className="space-y-4 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    How It Works
+                <li onClick={() => scrollToSection("process_overview")}>
+                  <a className="hover:text-white cursor-pointer transition-colors">
+                    Process overview
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#" className="hover:text-white transition-colors">
                     Pricing
                   </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                </li> */}
+                <li onClick={() => scrollToSection("success_stories")}>
+                  <a className="hover:text-white cursor-pointer transition-colors">
                     Success Stories
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#" className="hover:text-white transition-colors">
                     Analytics
                   </a>
-                </li>
+                </li> */}
               </ul>
             </div>
 
-            <div>
+            <div id="contact">
               <h4 className="font-semibold text-lg mb-6">Support</h4>
               <ul className="space-y-4 text-gray-400">
                 <li className="flex items-center">
@@ -1075,10 +943,10 @@ export default function ModernAdboxLanding() {
                   <Mail className="w-4 h-4 mr-2" />
                   <span>info@adboxgh.com</span>
                 </li>
-                <li className="flex items-center">
+                {/* <li className="flex items-center">
                   <MapPin className="w-4 h-4 mr-2" />
                   <span>Accra, Ghana</span>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
