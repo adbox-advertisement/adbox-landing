@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL_V1 = import.meta.env.VITE_BASE_URL;
+export const BASE_URL_V1 = import.meta.env.VITE_BASE_URL;
 import { Storage } from "./local.storage";
 
 const config: any = {

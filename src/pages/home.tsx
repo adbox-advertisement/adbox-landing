@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  Play,
   Smartphone,
   Shield,
   Video,
@@ -281,11 +280,21 @@ export default function ModernAdboxLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-12 h-12 gradient-animated rounded-xl flex items-center justify-center glow-effect">
-                  <Play className="text-white w-6 h-6" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+              <div className="rounded-full bg-gradient-to-br from-purple-400 to-purple-600 p-4 flex items-center justify-center shadow-md">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-6 h-6"
+                >
+                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                </svg>
               </div>
               <span className="font-bold text-2xl text-white">Adbox</span>
             </div>
@@ -882,13 +891,27 @@ export default function ModernAdboxLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 gradient-animated rounded-xl flex items-center justify-center">
-                  <Play className="text-white w-6 h-6" />
+              <div className="flex items-center space-x-3">
+                <div className="rounded-full bg-gradient-to-br from-purple-400 to-purple-600 p-4 flex items-center justify-center shadow-md">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6"
+                  >
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
                 </div>
-                <span className="font-bold text-2xl">Adbox</span>
+                <span className="font-bold text-2xl text-white">Adbox</span>
               </div>
-              <p className="text-gray-400 mb-6 max-w-md">
+
+              <p className="text-gray-400 mb-6 mt-6 max-w-md">
                 Ghana's leading digital advertising platform connecting brands
                 with engaged mobile audiences. Reach 30M+ users with guaranteed
                 results.
