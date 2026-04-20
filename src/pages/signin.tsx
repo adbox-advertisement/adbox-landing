@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { SiFacebook, SiApple } from "react-icons/si";
-import { useAuth } from "@/context/authContext";
+import { AuthProvider, useAuth } from "@/context/authContext";
 import { FcGoogle } from "react-icons/fc";
 import { BASE_URL_V1 } from "@/helpers/api.service";
+import { Toaster } from "@/components/ui/toaster";
 
-export default function SignIn() {
+function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
@@ -219,5 +220,14 @@ export default function SignIn() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <AuthProvider>
+      <SignInForm />
+      <Toaster />
+    </AuthProvider>
   );
 }

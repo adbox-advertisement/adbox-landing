@@ -1,997 +1,693 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  Smartphone,
-  Shield,
-  Video,
-  Users,
-  Clock,
-  Briefcase,
-  Phone,
-  Mail,
-  // MapPin,
-  Menu,
-  X,
   ArrowRight,
-  TrendingUp,
-  Target,
-  Zap,
-  ChevronDown,
-  Globe,
-  Award,
   BarChart3,
+  Briefcase,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  Mail,
+  Menu,
+  MousePointer2,
+  Phone,
+  Play,
+  Shield,
+  Smartphone,
+  Sparkles,
+  Store,
+  Target,
+  Users,
+  Video,
+  X,
+  Zap,
 } from "lucide-react";
+import {
+  LazyMotion,
+  domAnimation,
+  m,
+  useMotionValue,
+  useMotionTemplate,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { Link } from "wouter";
-import SocialPhoneMockup from "@/components/socialMedia/social";
-// Define types for state and props
-interface MousePosition {
+
+type NodePoint = {
+  id: string;
   x: number;
   y: number;
+  label: string;
+  value: string;
+  tone?: "mint" | "sky" | "rose" | "gold";
+};
+
+const viewerNodes: NodePoint[] = [
+  { id: "v1", x: 6, y: 12, label: "Coders", value: "42K", tone: "sky" },
+  { id: "v2", x: 15, y: 34, label: "Creators", value: "18K", tone: "mint" },
+  { id: "v3", x: 7, y: 58, label: "Makers", value: "63K", tone: "rose" },
+  { id: "v4", x: 22, y: 83, label: "Builders", value: "31K", tone: "gold" },
+  { id: "v5", x: 28, y: 19, label: "Designers", value: "27K", tone: "rose" },
+  { id: "v6", x: 19, y: 68, label: "Founders", value: "55K", tone: "sky" },
+  { id: "v7", x: 32, y: 48, label: "Analysts", value: "21K", tone: "mint" },
+  { id: "v8", x: 12, y: 90, label: "Fans", value: "39K", tone: "gold" },
+];
+
+const businessNodes: NodePoint[] = [
+  { id: "b1", x: 92, y: 13, label: "Retail", value: "+312%" },
+  { id: "b2", x: 82, y: 34, label: "Food", value: "8.1K" },
+  { id: "b3", x: 94, y: 58, label: "Fintech", value: "94%" },
+  { id: "b4", x: 76, y: 82, label: "Events", value: "24h" },
+  { id: "b5", x: 68, y: 20, label: "Services", value: "Active" },
+  { id: "b6", x: 88, y: 78, label: "Health", value: "Live" },
+  { id: "b7", x: 70, y: 52, label: "Beauty", value: "High" },
+  { id: "b8", x: 86, y: 91, label: "Travel", value: "Ready" },
+];
+
+const hubNodes: NodePoint[] = [
+  { id: "h1", x: 43, y: 22, label: "Interest", value: "Match" },
+  { id: "h2", x: 52, y: 39, label: "Location", value: "Sync" },
+  { id: "h3", x: 45, y: 61, label: "Intent", value: "Pulse" },
+  { id: "h4", x: 57, y: 76, label: "Creative", value: "Flow" },
+];
+
+const allConnections = [
+  ...viewerNodes.flatMap((viewer, viewerIndex) =>
+    hubNodes.map((hub, hubIndex) => ({
+      id: `${viewer.id}-${hub.id}`,
+      from: viewer,
+      to: hub,
+      weight: (viewerIndex + hubIndex) % 2 === 0 ? "primary" : "soft",
+    }))
+  ),
+  ...hubNodes.flatMap((hub, hubIndex) =>
+    businessNodes.map((business, businessIndex) => ({
+      id: `${hub.id}-${business.id}`,
+      from: hub,
+      to: business,
+      weight: (hubIndex + businessIndex) % 2 === 0 ? "primary" : "soft",
+    }))
+  ),
+  ...hubNodes.flatMap((hub, index) =>
+    hubNodes
+      .filter((_, nextIndex) => nextIndex > index)
+      .map((nextHub) => ({
+        id: `${hub.id}-${nextHub.id}`,
+        from: hub,
+        to: nextHub,
+        weight: "core",
+      }))
+  ),
+  ...viewerNodes.flatMap((viewer, viewerIndex) =>
+    businessNodes
+      .filter((_, businessIndex) => (viewerIndex * 2 + businessIndex) % 5 === 0)
+      .map((business) => ({
+        id: `${viewer.id}-${business.id}-direct`,
+        from: viewer,
+        to: business,
+        weight: "direct",
+      }))
+  ),
+];
+
+const stats = [
+  { value: "30M+", label: "reachable mobile audience" },
+  { value: "95%", label: "average video completion" },
+  { value: "24h", label: "campaign launch window" },
+  { value: "Live", label: "audience signal tracking" },
+];
+
+const capabilities = [
+  {
+    icon: Target,
+    title: "Audience targeting",
+    text: "Build campaigns around location, interest, behavior, and phone-first attention patterns.",
+  },
+  {
+    icon: Video,
+    title: "High-retention formats",
+    text: "Run video ads, interactive prompts, demos, and reward-led placements designed for completion.",
+  },
+  {
+    icon: BarChart3,
+    title: "Live campaign intelligence",
+    text: "Track views, completion, audience response, and conversion signals while the campaign is still moving.",
+  },
+  {
+    icon: Shield,
+    title: "Verified delivery",
+    text: "Use clean reporting that shows which audiences, channels, and messages are creating momentum.",
+  },
+];
+
+const flowSteps = [
+  {
+    number: "01",
+    title: "Choose the market",
+    text: "Pick the people, regions, and interests that matter to the business.",
+  },
+  {
+    number: "02",
+    title: "Launch the signal",
+    text: "Adbox distributes the campaign through viewer paths that already have attention.",
+  },
+  {
+    number: "03",
+    title: "Watch demand form",
+    text: "Business owners see live results as viewers engage, share, visit, and buy.",
+  },
+];
+
+const storyCards = [
+  {
+    name: "Neighborhood retail",
+    metric: "+312%",
+    label: "store visits",
+    image:
+      "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    name: "Mobile food brand",
+    metric: "8.1K",
+    label: "new orders",
+    image:
+      "https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    name: "Service campaign",
+    metric: "94%",
+    label: "completion rate",
+    image:
+      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=80",
+  },
+];
+
+function NetworkNode({
+  node,
+  type,
+  index,
+}: {
+  node: NodePoint;
+  type: "viewer" | "business" | "hub";
+  index: number;
+}) {
+  const tone = node.tone ?? "sky";
+
+  return (
+    <m.div
+      className={`absolute network-node ${
+        type === "viewer"
+          ? `viewer-node viewer-node-${tone}`
+          : type === "hub"
+            ? "hub-node"
+            : "business-node"
+      }`}
+      style={{ left: `${node.x}%`, top: `${node.y}%` }}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.35 + index * 0.08, duration: 0.7, ease: "easeOut" }}
+      whileHover={{ scale: 1.12, zIndex: 20 }}
+    >
+      {type === "viewer" ? (
+        <>
+          <span className="viewer-avatar" aria-hidden="true">
+            <span className="avatar-hair" />
+            <span className="avatar-face">
+              <span className="avatar-eyes" />
+              <span className="avatar-smile" />
+            </span>
+            <span className="avatar-shirt" />
+          </span>
+          <span className="node-label">{node.label}</span>
+          <span className="node-value">{node.value}</span>
+        </>
+      ) : (
+        <>
+          <span className="node-value">{node.value}</span>
+          <span className="node-label">{node.label}</span>
+        </>
+      )}
+    </m.div>
+  );
 }
 
-interface AnimatedStats {
-  publishers: number;
-  adSpend: number;
-  completion: number;
-  costPerView: number;
+function AdboxNetwork() {
+  const { scrollYProgress } = useScroll();
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 22,
+    mass: 0.4,
+  });
+  const rotate = useTransform(smoothProgress, [0, 1], [0, 110]);
+  const y = useTransform(smoothProgress, [0, 1], [0, -84]);
+  const lineOpacity = useTransform(smoothProgress, [0, 0.25, 0.8], [0.68, 1, 0.78]);
+
+  return (
+    <m.div className="network-stage" style={{ y }}>
+      <div className="network-halo halo-one" />
+      <div className="network-halo halo-two" />
+      <div className="network-copy left-copy">
+        <Users className="h-4 w-4" />
+        <span>Open-source people</span>
+      </div>
+      <div className="network-copy right-copy">
+        <Store className="h-4 w-4" />
+        <span>Business owners</span>
+      </div>
+
+      <svg className="connection-canvas" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#40a7fa" />
+            <stop offset="28%" stopColor="#1de5e7" />
+            <stop offset="62%" stopColor="#b644f5" />
+            <stop offset="100%" stopColor="#f85aef" />
+          </linearGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="1.1" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        {allConnections.map((connection, index) => {
+          const midX = 50 + ((index % 7) - 3) * 2.8;
+          const midY = 50 + ((index % 9) - 4) * 5.8;
+          const path = `M ${connection.from.x} ${connection.from.y} Q ${midX} ${midY} ${connection.to.x} ${connection.to.y}`;
+          const isSoft = connection.weight === "soft";
+          const isDirect = connection.weight === "direct";
+
+          return (
+            <g key={connection.id}>
+              <m.path
+                d={path}
+                fill="none"
+                stroke="url(#connectionGradient)"
+                strokeWidth={connection.weight === "core" ? "0.38" : isDirect ? "0.16" : isSoft ? "0.1" : "0.24"}
+                strokeLinecap="round"
+                strokeDasharray={isDirect ? "1.2 1.4" : undefined}
+                filter="url(#softGlow)"
+                style={{ opacity: lineOpacity }}
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ delay: 0.55 + index * 0.04, duration: 1.2, ease: "easeInOut" }}
+              />
+              <m.circle r={isSoft ? "0.32" : isDirect ? "0.42" : "0.62"} fill={isSoft ? "#b644f5" : isDirect ? "#1de5e7" : "#ffffff"}>
+                <animateMotion dur={`${4 + (index % 5) * 0.35}s`} repeatCount="indefinite" path={path} />
+              </m.circle>
+            </g>
+          );
+        })}
+      </svg>
+
+      {viewerNodes.map((node, index) => (
+        <NetworkNode key={node.id} node={node} index={index} type="viewer" />
+      ))}
+      {businessNodes.map((node, index) => (
+        <NetworkNode key={node.id} node={node} index={index} type="business" />
+      ))}
+      {hubNodes.map((node, index) => (
+        <NetworkNode key={node.id} node={node} index={index} type="hub" />
+      ))}
+
+      <m.div className="adbox-core" style={{ rotate }}>
+        <div className="orbit orbit-one" />
+        <div className="orbit orbit-two" />
+        <div className="core-disc">
+          <img src="/AdBox-icon-fullColor-gb-white.svg" alt="" />
+          <span>Adbox</span>
+        </div>
+        <div className="satellite satellite-one">
+          <MousePointer2 className="h-4 w-4" />
+        </div>
+        <div className="satellite satellite-two">
+          <Play className="h-4 w-4" />
+        </div>
+        <div className="satellite satellite-three">
+          <Zap className="h-4 w-4" />
+        </div>
+      </m.div>
+    </m.div>
+  );
+}
+
+function useMouseGlow() {
+  const x = useMotionValue(50);
+  const y = useMotionValue(30);
+
+  useEffect(() => {
+    const handleMove = (event: MouseEvent) => {
+      x.set((event.clientX / window.innerWidth) * 100);
+      y.set((event.clientY / window.innerHeight) * 100);
+    };
+
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [x, y]);
+
+  return useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, rgba(64, 167, 250, 0.2), transparent 32%), radial-gradient(circle at 78% 18%, rgba(248, 90, 239, 0.22), transparent 34%), linear-gradient(135deg, #060619 0%, #120a34 44%, #260849 100%)`;
 }
 
 export default function ModernAdboxLanding() {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
-  const [mousePosition, setMousePosition] = useState<MousePosition>({
-    x: 0,
-    y: 0,
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const background = useMouseGlow();
+  const { scrollYProgress } = useScroll();
+  const progressScale = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.5,
   });
-  const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [animatedStats, setAnimatedStats] = useState<AnimatedStats>({
-    publishers: 0,
-    adSpend: 0,
-    completion: 0,
-    costPerView: 0,
-  });
-  const heroRef = useRef<HTMLElement | null>(null);
-  const parallaxRef = useRef<HTMLDivElement | null>(null);
+
+  const navItems = useMemo(
+    () => [
+      { label: "Network", id: "network" },
+      { label: "Process", id: "process_overview" },
+      { label: "Results", id: "success_stories" },
+    ],
+    []
+  );
 
   useEffect(() => {
-    // Optimize event handlers with throttling
-    let scrollTimeout: NodeJS.Timeout;
-    let mouseTimeout: NodeJS.Timeout;
-
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const scrollY = window.scrollY;
-        setIsScrolled(scrollY > 50);
-
-        // Parallax effect for elements
-        if (parallaxRef.current) {
-          const parallaxElements =
-            parallaxRef.current.querySelectorAll(".parallax-element");
-          parallaxElements.forEach((el: Element, index: number) => {
-            const speed = 0.3 + index * 0.1; // Reduced speed for smoother effect
-            (el as HTMLElement).style.transform = `translateY(${
-              scrollY * speed
-            }px)`;
-          });
-        }
-      }, 16); // Throttle to ~60fps
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => {
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      }, 16); // Throttle mouse updates
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      clearTimeout(scrollTimeout);
-      clearTimeout(mouseTimeout);
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
-  const heroGradientStyle = {
-    background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.15) 0%, rgba(16, 24, 40, 0.8) 50%)`,
-  };
-
-  // Animated counter effect
-  useEffect(() => {
-    const animateStats = () => {
-      const targets: AnimatedStats = {
-        publishers: 1200,
-        adSpend: 45,
-        completion: 92,
-        costPerView: 65,
-      };
-      const duration = 2000;
-      const steps = 60;
-      const increment = duration / steps;
-
-      let current: AnimatedStats = {
-        publishers: 0,
-        adSpend: 0,
-        completion: 0,
-        costPerView: 0,
-      };
-
-      const timer = setInterval(() => {
-        current.publishers = Math.min(
-          current.publishers + targets.publishers / steps,
-          targets.publishers
-        );
-        current.adSpend = Math.min(
-          current.adSpend + targets.adSpend / steps,
-          targets.adSpend
-        );
-        current.completion = Math.min(
-          current.completion + targets.completion / steps,
-          targets.completion
-        );
-        current.costPerView = Math.min(
-          current.costPerView + targets.costPerView / steps,
-          targets.costPerView
-        );
-
-        setAnimatedStats({ ...current });
-
-        if (current.publishers >= targets.publishers) {
-          clearInterval(timer);
-        }
-      }, increment);
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        animateStats();
-        observer.disconnect();
-      }
-    });
-
-    const statsSection = document.getElementById("stats-section");
-    if (statsSection) observer.observe(statsSection);
-
-    console.log("Observer set on stats section", heroGradientStyle);
-    return () => observer.disconnect();
-  }, []);
-
-  // Auto-sliding testimonials
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
-    }, 4000);
-    return () => clearInterval(timer);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
     setIsMenuOpen(false);
   };
 
   return (
-    <div className="font-inter text-gray-900 overflow-x-hidden">
-      {/* Custom CSS for animations */}
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-20px) rotate(1deg); }
-          66% { transform: translateY(-10px) rotate(-1deg); }
-        }
+    <LazyMotion features={domAnimation}>
+    <div className="adbox-page text-white">
+      <m.div className="scroll-progress" style={{ scaleX: progressScale }} />
 
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3); }
-        }
+      <nav className={`adbox-nav ${isScrolled ? "nav-scrolled" : ""}`}>
+        <div className="nav-inner">
+          <button className="brand-mark" onClick={() => scrollToSection("top")} aria-label="Go to top">
+            <img className="brand-logo" src="/AdBox-logo-Coloured-Light.svg" alt="Adbox" />
+          </button>
 
-        @keyframes gradient-shift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(50px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-
-        .gradient-animated {
-          background: linear-gradient(-45deg, #8B5CF6, #A855F7, #C084FC, #DDD6FE);
-          background-size: 400% 400%;
-          animation: gradient-shift 4s ease infinite;
-        }
-
-        .floating-card {
-          transition: transform 0.3s ease;
-        }
-
-        .glow-effect {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        .slide-up-animation {
-          animation: slide-up 0.8s ease forwards;
-        }
-
-        .hover-lift {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .hover-lift:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .text-gradient {
-          background: linear-gradient(135deg, #8B5CF6, #EC4899);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .backdrop-blur-glass {
-          backdrop-filter: blur(20px);
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .feature-card-shimmer {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-        }
-
-        .feature-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transition: left 0.5s;
-        }
-
-        .feature-card:hover::before {
-          left: 100%;
-        }
-      `}</style>
-
-      {/* Navigation */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
-            ? "backdrop-blur-glass border-b border-white/20"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center space-x-3">
-              <div className="rounded-full bg-gradient-to-br from-purple-400 to-purple-600 p-4 flex items-center justify-center shadow-md">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-6 h-6"
-                >
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-              <span className="font-bold text-2xl text-white">Adbox</span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              {["Process overview", "Success Stories"].map((item) => (
-                <button
-                  key={item}
-                  onClick={() =>
-                    scrollToSection(item.toLowerCase().replace(" ", "_"))
-                  }
-                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 relative group cursor-pointer"
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
-                </button>
-              ))}
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/signin"
-                  className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 font-medium"
-                >
-                  Sign In
-                </Link>
-                {/* <button className="text-white/80 hover:text-white transition-all duration-300 hover:scale-110 font-medium">
-                  Sign In
-                </button> */}
-                <Link
-                  href="/signup"
-                  className="gradient-animated text-white px-8 py-3 rounded-full hover:scale-105 transition-all duration-300 transform font-medium shadow-lg hover:shadow-xl glow-effect"
-                >
-                  Start Campaign
-                </Link>
-              </div>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-white p-2 rounded-lg backdrop-blur-glass hover:scale-110 transition-transform"
-              >
-                {isMenuOpen ? (
-                  <X className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
+          <div className="desktop-nav">
+            {navItems.map((item) => (
+              <button key={item.id} onClick={() => scrollToSection(item.id)}>
+                {item.label}
               </button>
-            </div>
+            ))}
+            <Link href="/signin" className="nav-link">
+              Sign in
+            </Link>
+            <Link href="/signup" className="nav-cta">
+              Start campaign
+            </Link>
           </div>
 
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden backdrop-blur-glass border-t border-white/20 py-6 slide-up-animation">
-              <div className="flex flex-col space-y-4">
-                {["Process Overview", "Success Stories"].map((item) => (
-                  <button
-                    key={item}
-                    onClick={() =>
-                      scrollToSection(item.toLowerCase().replace(" ", "_"))
-                    }
-                    className="text-white/80 hover:text-white transition-colors text-left px-4 py-2 hover:bg-white/10 rounded-lg"
-                  >
-                    {item}
-                  </button>
-                ))}
-                <div className="px-4 space-y-3 pt-4 border-t border-white/20">
-                  <Link
-                    href="/signin"
-                    className="block w-full text-white/80 hover:text-white transition-colors font-medium text-left py-2"
-                  >
-                    Sign In
-                  </Link>
-
-                  <Link
-                    href="/signup"
-                    className="block w-full gradient-animated text-white px-6 py-3 rounded-full hover:scale-105 transition-transform font-medium text-center shadow-lg"
-                  >
-                    Start Campaign
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
+          <button
+            className="mobile-menu-button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label="Open navigation menu"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+
+        {isMenuOpen && (
+          <m.div
+            className="mobile-nav"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {navItems.map((item) => (
+              <button key={item.id} onClick={() => scrollToSection(item.id)}>
+                {item.label}
+              </button>
+            ))}
+            <Link href="/signin">Sign in</Link>
+            <Link href="/signup" className="mobile-cta">
+              Start campaign
+            </Link>
+          </m.div>
+        )}
       </nav>
 
-      {/* Hero Section */}
-      <section
-        ref={heroRef}
-        className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white overflow-hidden relative flex items-center"
-      >
-        {/* Animated Background */}
-        <div className="absolute inset-0" ref={parallaxRef}>
-          <div className="parallax-element absolute top-20 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="parallax-element absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div
-            className="parallax-element absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-full blur-3xl animate-spin"
-            style={{ animationDuration: "20s" }}
-          ></div>
+      <m.section id="top" className="hero-section" style={{ background }}>
+        <div className="grid-field" />
+        <div className="hero-content">
+          <m.div
+            className="hero-copy"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="eyebrow">
+              <Sparkles className="h-4 w-4" />
+              Ghana's viewer to business network
+            </div>
+            <h1>
+              A bigger, brighter way to connect viewers with businesses.
+            </h1>
+            <p>
+              Adbox connects business owners to people already watching, tapping,
+              sharing, and discovering. Launch a campaign, follow the signal, and
+              see attention move through the network.
+            </p>
+            <div className="hero-actions">
+              <Link href="/signup" className="primary-action">
+                Start campaign <ArrowRight className="h-5 w-5" />
+              </Link>
+              <button className="secondary-action" onClick={() => scrollToSection("network")}>
+                Explore the network
+              </button>
+            </div>
+          </m.div>
 
-          {/* Floating particles */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-              }}
-            ></div>
+          <AdboxNetwork />
+        </div>
+
+        <div className="hero-stat-row">
+          {stats.map((stat, index) => (
+            <m.div
+              key={stat.label}
+              className="stat-tile"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 + index * 0.08, duration: 0.55 }}
+            >
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </m.div>
           ))}
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 mb-8 slide-up-animation">
-                <Globe className="w-4 h-4 mr-2 text-green-400" />
-                <span className="text-sm">Now Live in Ghana</span>
-              </div>
+        <button className="scroll-cue" onClick={() => scrollToSection("network")} aria-label="Scroll to network">
+          <ChevronDown className="h-7 w-7" />
+        </button>
+      </m.section>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-8 slide-up-animation">
-                Reach Ghana's
-                <br />
-                <span className="text-gradient animate-pulse text-6xl sm:text-7xl lg:text-8xl">
-                  30 Million
-                </span>
-                <br />
-                Mobile Users
-              </h1>
-
-              <p className="text-xl text-white/80 mb-10 max-w-lg mx-auto lg:mx-0 slide-up-animation animation-delay-200">
-                The most effective digital advertising platform for brands
-                targeting Ghana's engaged mobile audience. Launch campaigns that
-                convert in 24 hours.
-              </p>
-
-              <div className="flex flex-col items-center sm:flex-row gap-6 justify-center lg:justify-start slide-up-animation animation-delay-400">
-                {/* New Download App Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <a
-                    href="https://apps.apple.com/app/adbox/id123456789" // Replace with actual App Store link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative border-2 border-gray-200/20 bg-white/10 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold text-base tracking-tight hover:bg-white/20 hover:border-gray-200/40 transition-all duration-300 ease-in-out transform flex items-center justify-center space-x-3 shadow-md hover:shadow-lg"
-                  >
-                    <span className="sm:inline">Download for iOS</span>
-                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  </a>
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.adbox.app" // Replace with actual Google Play link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative border-2 border-gray-200/20 bg-white/10 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold text-base tracking-tight hover:bg-white/20 hover:border-gray-200/40 transition-all duration-300 ease-in-out transform flex items-center justify-center space-x-3 shadow-md hover:shadow-lg"
-                  >
-                    <span className="sm:inline">Download for Android</span>
-                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  </a>
-                </div>
-              </div>
-
-              {/* Live metrics */}
-              <div className="grid grid-cols-3 gap-6 mt-16 slide-up-animation animation-delay-600">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-1">
-                    95%
-                  </div>
-                  <div className="text-sm text-white/60">Completion Rate</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400 mb-1">
-                    ₵0.65
-                  </div>
-                  <div className="text-sm text-white/60">Cost Per View</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-400 mb-1">
-                    24hr
-                  </div>
-                  <div className="text-sm text-white/60">Launch Time</div>
-                </div>
-              </div>
-            </div>
-
-            <SocialPhoneMockup />
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 animate-bounce">
-          <ChevronDown className="w-8 h-8" />
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section
-        id="stats-section"
-        className="py-20 bg-white relative overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Platform Performance
-            </h2>
-            <p className="text-xl text-gray-600">
-              Real numbers from our advertising ecosystem
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              {
-                value: Math.round(animatedStats.publishers),
-                suffix: "+",
-                label: "Active Publishers",
-                color: "purple",
-                icon: Users,
-              },
-              {
-                value: "₵",
-                suffix: `${Math.round(animatedStats.adSpend)}M+`,
-                label: "Ad Spend Processed",
-                color: "green",
-                icon: TrendingUp,
-              },
-              {
-                value: Math.round(animatedStats.completion),
-                suffix: "%",
-                label: "Average Completion Rate",
-                color: "blue",
-                icon: Target,
-              },
-              {
-                value: "₵0.",
-                suffix: Math.round(animatedStats.costPerView),
-                label: "Average Cost Per View",
-                color: "pink",
-                icon: Zap,
-              },
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-3xl p-8 shadow-lg hover-lift border border-gray-100 text-center group"
-              >
-                <div
-                  className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-${stat.color}-100 flex items-center justify-center group-hover:scale-110 transition-transform`}
-                >
-                  <stat.icon className={`w-8 h-8 text-${stat.color}-600`} />
-                </div>
-                <div
-                  className={`text-4xl font-bold text-${stat.color}-600 mb-2`}
-                >
-                  {stat.value}
-                  {stat.suffix}
-                </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Features Section - Enhanced Styling */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-40 h-40 bg-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-60 h-60 bg-pink-200/30 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-100/20 to-pink-100/20 rounded-full blur-3xl animate-pulse"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Why Publishers Choose Adbox
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The most cost-effective platform to reach Ghana's mobile-first
-              audience with guaranteed engagement
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Target,
-                title: "Precision Targeting",
-                desc: "Target specific demographics, locations, and interests across Ghana with advanced audience segmentation.",
-                color: "purple",
-              },
-              {
-                icon: Award,
-                title: "Guaranteed Results",
-                desc: "92% average completion rate with engaged audiences. Pay only for verified views and meaningful engagement.",
-                color: "red",
-              },
-              {
-                icon: Shield,
-                title: "Transparent Analytics",
-                desc: "Real-time campaign analytics, completion rates, audience insights, and ROI tracking for all campaigns.",
-                color: "blue",
-              },
-              {
-                icon: Video,
-                title: "Premium Ad Formats",
-                desc: "Video ads, interactive surveys, product demos, and branded content optimized for mobile engagement.",
-                color: "red",
-              },
-              {
-                icon: Users,
-                title: "Audience Targeting",
-                desc: "Target specific demographics, interests, and locations across Ghana for maximum campaign effectiveness.",
-                color: "blue",
-              },
-              {
-                icon: Smartphone,
-                title: "Mobile-First Platform",
-                desc: "Optimized for Ghana's mobile-first audience with seamless experience across all network conditions.",
-                color: "purple",
-              },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className={`feature-card group bg-white rounded-3xl p-8 shadow-lg hover-lift border border-gray-100 relative overflow-hidden slide-up-animation ${
-                  index % 2 === 0
-                    ? "animation-delay-200"
-                    : "animation-delay-400"
-                }`}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform =
-                    "translateY(-12px) scale(1.03)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform =
-                    "translateY(0) scale(1)";
-                }}
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br from-${feature.color}-50 to-${feature.color}-100 opacity-0 group-hover:opacity-100 transition-all duration-700`}
-                ></div>
-
-                <div
-                  className={`relative w-20 h-20 bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 shadow-lg hover:shadow-2xl`}
-                >
-                  <feature.icon className="text-white w-10 h-10" />
-                </div>
-
-                <h3 className="relative text-2xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-all duration-300">
-                  {feature.title}
-                </h3>
-                <p className="relative text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                  {feature.desc}
-                </p>
-
-                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
-                  <ArrowRight className={`w-6 h-6 text-${feature.color}-500`} />
-                </div>
-
-                {/* Shimmer overlay on hover */}
-                <div className="absolute inset-0 feature-card-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Success Stories Carousel */}
-      <section id="success_stories" className=" py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Success Stories
-            </h2>
-            <p className="text-xl text-gray-600">
-              See how leading brands are reaching Ghana's mobile audience
-            </p>
-          </div>
-
-          <div className="relative">
-            <div className="overflow-hidden rounded-3xl">
-              <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
-                {[
-                  {
-                    company: "MTN Ghana",
-                    metric: "95%",
-                    metricLabel: "Completion Rate",
-                    bg: "from-yellow-400 to-red-500",
-                    results: "Reached 25,000+ users with 95% completion rate",
-                    roi: "+340% ROI",
-                  },
-                  {
-                    company: "Vodafone",
-                    metric: "₵18K",
-                    metricLabel: "Revenue Generated",
-                    bg: "from-red-500 to-pink-500",
-                    results: "Increased app downloads by 280% in 2 months",
-                    roi: "+280% Downloads",
-                  },
-                  {
-                    company: "GhanaPost GPS",
-                    metric: "12K",
-                    metricLabel: "New Signups",
-                    bg: "from-blue-500 to-green-500",
-                    results: "Generated 12,000+ new app signups in 30 days",
-                    roi: "+450% Signups",
-                  },
-                ].map((story, index) => (
-                  <div key={index} className="w-full flex-shrink-0">
-                    <div
-                      className={`bg-gradient-to-br ${story.bg} rounded-3xl p-12 text-white relative overflow-hidden`}
-                    >
-                      <div className="absolute inset-0 bg-black/20"></div>
-                      <div className="relative z-10">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                          <div>
-                            <h3 className="text-4xl font-bold mb-4">
-                              {story.company}
-                            </h3>
-                            <p className="text-xl mb-6 text-white/90">
-                              {story.results}
-                            </p>
-                            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
-                              <TrendingUp className="w-5 h-5 mr-2" />
-                              <span className="font-semibold">{story.roi}</span>
-                            </div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-6xl font-bold mb-2">
-                              {story.metric}
-                            </div>
-                            <div className="text-xl text-white/80">
-                              {story.metricLabel}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Animated background elements */}
-                      <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-                      <div className="absolute bottom-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-2xl animate-pulse animation-delay-1000"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Carousel indicators */}
-            <div className="flex justify-center mt-8 space-x-3">
-              {[0, 1, 2].map((index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    currentSlide === index ? "bg-purple-500 w-8" : "bg-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section
-        id="process_overview"
-        className="py-24 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden"
-      >
-        <div className="absolute inset-0">
-          <div className="absolute top-40 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 id="" className="text-5xl font-bold mb-6">
-              Launch in 3 Simple Steps
-            </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Start reaching Ghana's mobile audience in just 24 hours with our
-              streamlined campaign process
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              {
-                step: "01",
-                icon: Target,
-                title: "Define Your Audience",
-                desc: "Choose demographics, interests, and locations across Ghana. Our AI helps optimize targeting for maximum engagement.",
-              },
-              {
-                step: "02",
-                icon: Video,
-                title: "Create Your Campaign",
-                desc: "Upload your video ad, set your budget, and customize your campaign settings. Our team provides creative support.",
-              },
-              {
-                step: "03",
-                icon: BarChart3,
-                title: "Launch & Optimize",
-                desc: "Go live in 24 hours and track real-time performance. Optimize campaigns based on detailed analytics and insights.",
-              },
-            ].map((item, index) => (
-              <div key={index} className="relative group">
-                <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 hover:scale-105 border border-white/20">
-                  <div className="flex items-center mb-6">
-                    <div className="text-6xl font-bold text-purple-400 mr-4">
-                      {item.step}
-                    </div>
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center">
-                      <item.icon className="w-8 h-8 text-white" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
-                  <p className="text-white/80 leading-relaxed">{item.desc}</p>
-                </div>
-
-                {/* Connection line */}
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-purple-400 to-transparent"></div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50"></div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center bg-purple-100 text-purple-800 rounded-full px-6 py-2 mb-8">
-            <Zap className="w-4 h-4 mr-2" />
-            <span className="text-sm font-semibold">
-              Limited Time: No Setup Fees
-            </span>
-          </div>
-
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            Ready to Reach Ghana's Mobile Audience?
-          </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Join 1,200+ publishers already earning with Adbox. Launch your first
-            campaign today and see results in 24 hours.
+      <section id="network" className="network-story-section">
+        <div className="section-heading">
+          <span>Signal flow</span>
+          <h2>Customers and business owners do not sit in separate worlds anymore.</h2>
+          <p>
+            Adbox acts like a live bridge between attention and ambition:
+            viewers create momentum, businesses receive measurable demand, and the
+            network keeps learning where the next conversion should go.
           </p>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-            <Link
-              href="/signup"
-              className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-6 rounded-2xl font-semibold hover:scale-105 transition-all duration-300 transform flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden"
+        <div className="signal-grid">
+          {capabilities.map((item, index) => (
+            <m.article
+              key={item.title}
+              className="signal-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ delay: index * 0.08, duration: 0.55 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <Briefcase className="w-6 h-6 relative z-10" />
-              <span className="relative z-10 text-lg">Start Campaign Now</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
+              <item.icon className="h-7 w-7" />
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </m.article>
+          ))}
+        </div>
+
+        <div className="team-showcase">
+          <div className="team-image-wrap">
+            <img
+              src="/adboxteam.webp"
+              alt="Adbox team"
+              width="1536"
+              height="1024"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div className="team-copy">
+            <span>Team on the ground</span>
+            <h3>Built close to the people, creators, and businesses it serves.</h3>
+            <p>
+              Adbox brings local market insight, campaign execution, and live
+              audience feedback into one path, so business owners can move from
+              idea to measurable demand without guesswork.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="process_overview" className="process-section">
+        <div className="process-rail">
+          {flowSteps.map((step, index) => (
+            <m.div
+              key={step.number}
+              className="process-step"
+              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+            >
+              <span>{step.number}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+            </m.div>
+          ))}
+        </div>
+
+        <m.div
+          className="phone-console"
+          initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+          whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="iphone-island" />
+          <div className="phone-screen">
+            <video
+              className="campaign-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
+            >
+              <source
+                src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <div className="phone-video-shade" />
+            <div className="phone-status">
+              <span>9:41</span>
+              <span>5G</span>
+            </div>
+            <div className="phone-content">
+              <div className="live-pill">Live campaign</div>
+              <h3>Adbox signal preview</h3>
+              <p>Viewers are engaging with the campaign in real time.</p>
+            </div>
+            <div className="metric-stack">
+              <div>
+                <span>Views</span>
+                <strong>128,450</strong>
+              </div>
+              <div>
+                <span>Completion</span>
+                <strong>95%</strong>
+              </div>
+              <div>
+                <span>Audience pulse</span>
+                <strong>Live</strong>
+              </div>
+            </div>
+          </div>
+        </m.div>
+      </section>
+
+      <section id="success_stories" className="results-section">
+        <div className="section-heading">
+          <span>Proof of movement</span>
+          <h2>Every campaign becomes a visible path from attention to action.</h2>
+        </div>
+
+        <div className="story-grid">
+          {storyCards.map((story, index) => (
+            <m.article
+              key={story.name}
+              className="story-card"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: index * 0.1, duration: 0.6 }}
+            >
+              <img src={story.image} alt="" loading="lazy" decoding="async" />
+              <div className="story-overlay">
+                <span>{story.name}</span>
+                <strong>{story.metric}</strong>
+                <p>{story.label}</p>
+              </div>
+            </m.article>
+          ))}
+        </div>
+      </section>
+
+      <section className="cta-section">
+        <div className="cta-panel">
+          <div>
+            <span className="eyebrow dark">
+              <CheckCircle2 className="h-4 w-4" />
+              Built for business owners
+            </span>
+            <h2>Put your business inside the attention network.</h2>
+            <p>
+              Start with a focused campaign, measure the response, and scale into
+              the channels that are already producing customers.
+            </p>
+          </div>
+          <div className="cta-actions">
+            <Link href="/signup" className="primary-action dark-action">
+              Start campaign <Briefcase className="h-5 w-5" />
             </Link>
-
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="cursor-pointer group border-2 border-purple-200 text-purple-600 px-12 py-6 rounded-2xl font-semibold hover:scale-105 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 transform flex items-center justify-center space-x-3"
-            >
-              <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" />
-              <span className="text-lg">Schedule Demo</span>
+            <button className="secondary-action dark-outline" onClick={() => scrollToSection("contact")}>
+              Schedule demo
             </button>
           </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-gray-500">
-            <div className="flex items-center">
-              <Shield className="w-5 h-5 mr-2 text-green-500" />
-              <span>No Setup Fees</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-blue-500" />
-              <span>24hr Launch Time</span>
-            </div>
-            <div className="flex items-center">
-              <Award className="w-5 h-5 mr-2 text-purple-500" />
-              <span>92% Success Rate</span>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3">
-                <div className="rounded-full bg-gradient-to-br from-purple-400 to-purple-600 p-4 flex items-center justify-center shadow-md">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-6 h-6"
-                  >
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
-                </div>
-                <span className="font-bold text-2xl text-white">Adbox</span>
-              </div>
-
-              <p className="text-gray-400 mb-6 mt-6 max-w-md">
-                Ghana's leading digital advertising platform connecting brands
-                with engaged mobile audiences. Reach 30M+ users with guaranteed
-                results.
-              </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <Video className="w-5 h-5" />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-lg mb-6">Platform</h4>
-              <ul className="space-y-4 text-gray-400">
-                <li onClick={() => scrollToSection("process_overview")}>
-                  <a className="hover:text-white cursor-pointer transition-colors">
-                    Process overview
-                  </a>
-                </li>
-                {/* <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Pricing
-                  </a>
-                </li> */}
-                <li onClick={() => scrollToSection("success_stories")}>
-                  <a className="hover:text-white cursor-pointer transition-colors">
-                    Success Stories
-                  </a>
-                </li>
-                {/* <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Analytics
-                  </a>
-                </li> */}
-              </ul>
-            </div>
-
-            <div id="contact">
-              <h4 className="font-semibold text-lg mb-6">Support</h4>
-              <ul className="space-y-4 text-gray-400">
-                <li className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
-                  <span>+233 53 889 7225</span>
-                </li>
-                <li className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
-                  <span>info@adboxgh.com</span>
-                </li>
-                {/* <li className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  <span>Accra, Ghana</span>
-                </li> */}
-              </ul>
-            </div>
+      <footer id="contact" className="footer-section">
+        <div className="footer-brand">
+          <div className="brand-mark static">
+            <img className="brand-logo footer-logo" src="/AdBox-logo-white.svg" alt="Adbox" />
           </div>
+          <p>
+            Ghana's digital advertising platform for connecting business owners
+            with viewers who can become customers.
+          </p>
+        </div>
 
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">
-              © 2025 Adbox Ghana. All rights reserved.
-            </p>
-            <div className="flex space-x-6 text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                Contact
-              </a>
-            </div>
-          </div>
+        <div className="footer-contact">
+          <a href="tel:+233538897225">
+            <Phone className="h-4 w-4" /> +233 53 889 7225
+          </a>
+          <a href="mailto:info@adboxgh.com">
+            <Mail className="h-4 w-4" /> info@adboxgh.com
+          </a>
+          <span>
+            <Clock className="h-4 w-4" /> Campaigns launch in 24 hours
+          </span>
+          <span>
+            <Smartphone className="h-4 w-4" /> Mobile-first delivery
+          </span>
         </div>
       </footer>
     </div>
+    </LazyMotion>
   );
 }
