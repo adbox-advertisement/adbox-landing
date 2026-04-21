@@ -60,7 +60,7 @@ export default function SignUp() {
           Start advertising today
         </h2>
         <p className="text-center text-gray-600 mb-8">
-          Create your publisher account and reach 50,000+ engaged users
+          Create your business owner account and reach 50,000+ engaged customers
         </p>
       </div>
 
@@ -292,26 +292,6 @@ export default function SignUp() {
             </div>
           </form>
 
-          {/* Sign in link */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Already have an account?</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                href="/signin"
-                className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-adbox-primary transition-colors"
-              >
-                Sign in instead
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </div>

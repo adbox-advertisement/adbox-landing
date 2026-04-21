@@ -467,10 +467,12 @@ body {
 .nav-cta,
 .primary-action,
 .mobile-cta {
+  border: 0;
   color: #ffffff;
   background: linear-gradient(135deg, var(--adbox-blue), var(--adbox-purple), var(--adbox-magenta));
   padding: 10px 16px;
   box-shadow: 0 16px 44px rgba(182, 68, 245, 0.3);
+  cursor: pointer;
 }
 
 .nav-cta:hover,
@@ -723,10 +725,21 @@ body {
   background: rgba(255, 255, 255, 0.14);
 }
 
-.business-photo {
-  width: 34px;
-  height: 34px;
-  border-color: rgba(248, 90, 239, 0.68);
+.company-logo {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 4px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
+    linear-gradient(135deg, var(--adbox-blue), var(--adbox-magenta));
+  color: var(--adbox-blue);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0;
 }
 
 .business-node {
@@ -896,6 +909,7 @@ body {
 }
 
 .network-story-section,
+.app-download-section,
 .results-section,
 .cta-section {
   padding: clamp(72px, 10vw, 136px) clamp(16px, 4vw, 48px);
@@ -1211,6 +1225,176 @@ body {
   line-height: 1;
 }
 
+.app-download-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: clamp(28px, 6vw, 86px);
+  align-items: center;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(29, 229, 231, 0.18), transparent 24%),
+    radial-gradient(circle at 86% 70%, rgba(248, 90, 239, 0.18), transparent 24%),
+    #f8fbff;
+  color: var(--adbox-ink);
+}
+
+.app-download-copy {
+  max-width: 760px;
+  justify-self: end;
+}
+
+.app-download-copy > span,
+.location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--adbox-blue);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.app-download-copy h2 {
+  margin: 14px 0 0;
+  font-size: clamp(2.4rem, 5vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.app-download-copy p {
+  max-width: 620px;
+  margin: 22px 0 0;
+  color: rgba(6, 6, 25, 0.68);
+  line-height: 1.8;
+}
+
+.download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.store-button {
+  display: inline-flex;
+  min-width: 210px;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(6, 6, 25, 0.12);
+  border-radius: 8px;
+  background: #060619;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.store-button span {
+  display: grid;
+  gap: 2px;
+  line-height: 1.05;
+}
+
+.store-button small {
+  color: rgba(248, 251, 255, 0.62);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.location-pill {
+  margin-top: 22px;
+  padding: 10px 12px;
+  border: 1px solid rgba(71, 39, 252, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.app-preview {
+  display: grid;
+  justify-self: start;
+  width: min(100%, 360px);
+  place-items: center;
+}
+
+.app-phone {
+  width: min(100%, 280px);
+  aspect-ratio: 9 / 18.5;
+  padding: 10px;
+  border: 1px solid rgba(6, 6, 25, 0.14);
+  border-radius: 38px;
+  background: linear-gradient(145deg, #1b1850, #05050c);
+  box-shadow: 0 24px 70px rgba(71, 39, 252, 0.2);
+}
+
+.app-phone-screen {
+  display: grid;
+  height: 100%;
+  align-content: end;
+  padding: 24px;
+  overflow: hidden;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(248, 251, 255, 0.2), transparent 18%),
+    linear-gradient(155deg, #15124b 0%, #321570 52%, #071426 100%);
+  color: #ffffff;
+}
+
+.app-phone-screen img {
+  width: 74px;
+  height: 74px;
+  object-fit: contain;
+  margin-bottom: auto;
+}
+
+.app-phone-screen span {
+  color: rgba(248, 251, 255, 0.68);
+  font-weight: 850;
+}
+
+.app-phone-screen strong {
+  margin-top: 10px;
+  color: var(--adbox-cyan);
+  font-size: 3rem;
+  line-height: 0.95;
+}
+
+.app-phone-screen p {
+  margin: 8px 0 18px;
+  color: rgba(248, 251, 255, 0.74);
+}
+
+.app-bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  align-items: end;
+  height: 86px;
+}
+
+.app-bars i {
+  display: block;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, var(--adbox-cyan), var(--adbox-purple));
+}
+
+.app-bars i:nth-child(1) {
+  height: 42%;
+}
+
+.app-bars i:nth-child(2) {
+  height: 68%;
+}
+
+.app-bars i:nth-child(3) {
+  height: 52%;
+}
+
+.app-bars i:nth-child(4) {
+  height: 86%;
+}
+
 .results-section {
   background:
     radial-gradient(circle at 20% 0%, rgba(71, 39, 252, 0.18), transparent 24%),
@@ -1449,6 +1633,7 @@ body {
   .hero-content,
   .process-section,
   .team-showcase,
+  .app-download-section,
   .cta-panel,
   .footer-section {
     grid-template-columns: 1fr;
@@ -1457,6 +1642,8 @@ body {
   .network-stage,
   .process-rail,
   .team-image-wrap,
+  .app-download-copy,
+  .app-preview,
   .phone-console,
   .footer-contact {
     justify-self: stretch;
@@ -1522,6 +1709,11 @@ body {
     height: 39px;
   }
 
+  .company-logo {
+    width: 34px;
+    height: 34px;
+  }
+
   .hub-node {
     width: 64px;
     min-height: 64px;
@@ -1564,6 +1756,10 @@ body {
   .phone-console {
     width: min(100%, 330px);
     justify-self: center;
+  }
+
+  .store-button {
+    flex: 1 1 100%;
   }
 
   .story-card {

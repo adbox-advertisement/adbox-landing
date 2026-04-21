@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  Apple,
   BarChart3,
-  Briefcase,
   CheckCircle2,
   ChevronDown,
   Clock,
+  Download,
   Mail,
+  MapPin,
   Menu,
   MousePointer2,
   Phone,
@@ -26,7 +28,6 @@ import {
   domAnimation,
   m,
 } from "framer-motion";
-import { Link } from "wouter";
 
 type NodePoint = {
   id: string;
@@ -35,6 +36,7 @@ type NodePoint = {
   label: string;
   value: string;
   image?: string;
+  logo?: string;
   tone?: "mint" | "sky" | "rose" | "gold";
 };
 
@@ -50,14 +52,14 @@ const viewerNodes: NodePoint[] = [
 ];
 
 const businessNodes: NodePoint[] = [
-  { id: "b1", x: 92, y: 13, label: "Retail owner", value: "+312%", image: "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b2", x: 82, y: 34, label: "Food owner", value: "8.1K", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b3", x: 94, y: 58, label: "Fintech owner", value: "94%", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b4", x: 76, y: 82, label: "Event owner", value: "24h", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b5", x: 68, y: 20, label: "Service owner", value: "Active", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b6", x: 88, y: 78, label: "Health owner", value: "Live", image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b7", x: 70, y: 52, label: "Beauty owner", value: "High", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=96&h=96&q=55" },
-  { id: "b8", x: 86, y: 91, label: "Travel owner", value: "Ready", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b1", x: 92, y: 13, label: "Retail Co.", value: "+312%", logo: "RC" },
+  { id: "b2", x: 82, y: 34, label: "Food Lab", value: "8.1K", logo: "FL" },
+  { id: "b3", x: 94, y: 58, label: "PayGrid", value: "94%", logo: "PG" },
+  { id: "b4", x: 76, y: 82, label: "Event Hub", value: "24h", logo: "EH" },
+  { id: "b5", x: 68, y: 20, label: "Service Pro", value: "Active", logo: "SP" },
+  { id: "b6", x: 88, y: 78, label: "Health Plus", value: "Live", logo: "H+" },
+  { id: "b7", x: 70, y: 52, label: "Beauty Co.", value: "High", logo: "BC" },
+  { id: "b8", x: 86, y: 91, label: "Travel Go", value: "Ready", logo: "TG" },
 ];
 
 const hubNodes: NodePoint[] = [
@@ -180,6 +182,11 @@ const storyCards = [
   },
 ];
 
+const appDownloadLinks = [
+  { label: "Download for iPhone", detail: "App Store", icon: Apple },
+  { label: "Download for Android", detail: "Google Play", icon: Smartphone },
+];
+
 function NetworkNode({
   node,
   type,
@@ -214,8 +221,10 @@ function NetworkNode({
         </>
       ) : (
         <>
-          {type === "business" && node.image && (
-            <img className="node-photo business-photo" src={node.image} alt="" loading="eager" decoding="async" />
+          {type === "business" && node.logo && (
+            <span className="company-logo" aria-hidden="true">
+              {node.logo}
+            </span>
           )}
           <span className="node-value">{node.value}</span>
           <span className="node-label">{node.label}</span>
@@ -309,6 +318,7 @@ export default function ModernAdboxLanding() {
     () => [
       { label: "Network", id: "network" },
       { label: "Process", id: "process_overview" },
+      { label: "App", id: "download_app" },
       { label: "Results", id: "success_stories" },
     ],
     []
@@ -354,12 +364,9 @@ export default function ModernAdboxLanding() {
                 {item.label}
               </button>
             ))}
-            <Link href="/signin" className="nav-link">
-              Sign in
-            </Link>
-            <Link href="/signup" className="nav-cta">
-              Start campaign
-            </Link>
+            <button className="nav-cta" onClick={() => scrollToSection("download_app")}>
+              Start now
+            </button>
           </div>
 
           <button
@@ -382,10 +389,9 @@ export default function ModernAdboxLanding() {
                 {item.label}
               </button>
             ))}
-            <Link href="/signin">Sign in</Link>
-            <Link href="/signup" className="mobile-cta">
-              Start campaign
-            </Link>
+            <button className="mobile-cta" onClick={() => scrollToSection("download_app")}>
+              Start now
+            </button>
           </m.div>
         )}
       </nav>
@@ -412,9 +418,9 @@ export default function ModernAdboxLanding() {
               see attention move through the network.
             </p>
             <div className="hero-actions">
-              <Link href="/signup" className="primary-action">
-                Start campaign <ArrowRight className="h-5 w-5" />
-              </Link>
+              <button className="primary-action" onClick={() => scrollToSection("download_app")}>
+                Start now <ArrowRight className="h-5 w-5" />
+              </button>
               <button className="secondary-action" onClick={() => scrollToSection("network")}>
                 Explore the network
               </button>
@@ -553,6 +559,51 @@ export default function ModernAdboxLanding() {
         </m.div>
       </section>
 
+      <section id="download_app" className="app-download-section">
+        <div className="app-download-copy">
+          <span>
+            <Download className="h-4 w-4" />
+            Download our app
+          </span>
+          <h2>Start now from your phone.</h2>
+          <p>
+            Launch campaigns, follow customer activity, and track business growth
+            from the Adbox mobile app.
+          </p>
+          <div className="download-actions">
+            {appDownloadLinks.map((item) => (
+              <a key={item.label} href="#" className="store-button" aria-label={item.label}>
+                <item.icon className="h-6 w-6" />
+                <span>
+                  <small>{item.detail}</small>
+                  {item.label}
+                </span>
+              </a>
+            ))}
+          </div>
+          <div className="location-pill">
+            <MapPin className="h-4 w-4" />
+            Accra, Ghana
+          </div>
+        </div>
+        <div className="app-preview" aria-hidden="true">
+          <div className="app-phone">
+            <div className="app-phone-screen">
+              <img src="/use%20this.png" alt="" />
+              <span>Adbox Mobile</span>
+              <strong>128,450</strong>
+              <p>Customers reached this week</p>
+              <div className="app-bars">
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="success_stories" className="results-section">
         <div className="section-heading">
           <span>Proof of movement</span>
@@ -594,9 +645,9 @@ export default function ModernAdboxLanding() {
             </p>
           </div>
           <div className="cta-actions">
-            <Link href="/signup" className="primary-action dark-action">
-              Start campaign <Briefcase className="h-5 w-5" />
-            </Link>
+            <button className="primary-action dark-action" onClick={() => scrollToSection("download_app")}>
+              Start now <Download className="h-5 w-5" />
+            </button>
             <button className="secondary-action dark-outline" onClick={() => scrollToSection("contact")}>
               Schedule demo
             </button>
@@ -627,6 +678,9 @@ export default function ModernAdboxLanding() {
           </span>
           <span>
             <Smartphone className="h-4 w-4" /> Mobile-first delivery
+          </span>
+          <span>
+            <MapPin className="h-4 w-4" /> Accra, Ghana
           </span>
         </div>
       </footer>

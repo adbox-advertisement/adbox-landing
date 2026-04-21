@@ -3,7 +3,6 @@ import { Switch, Route } from "wouter";
 import Home from "./pages/home";
 import CookieConsent from "./components/CookieConsent";
 
-const SignIn = lazy(() => import("./pages/signin"));
 const SignUp = lazy(() => import("./pages/signup"));
 const NotFound = lazy(() => import("./pages/not-found"));
 
@@ -16,7 +15,6 @@ function Router() {
     <Suspense fallback={<PageFallback />}>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/signin" component={SignIn} />
         <Route path="/signup" component={SignUp} />
         <Route component={NotFound} />
       </Switch>
