@@ -25,11 +25,6 @@ import {
   LazyMotion,
   domAnimation,
   m,
-  useMotionValue,
-  useMotionTemplate,
-  useScroll,
-  useSpring,
-  useTransform,
 } from "framer-motion";
 import { Link } from "wouter";
 
@@ -39,29 +34,30 @@ type NodePoint = {
   y: number;
   label: string;
   value: string;
+  image?: string;
   tone?: "mint" | "sky" | "rose" | "gold";
 };
 
 const viewerNodes: NodePoint[] = [
-  { id: "v1", x: 6, y: 12, label: "Coders", value: "42K", tone: "sky" },
-  { id: "v2", x: 15, y: 34, label: "Creators", value: "18K", tone: "mint" },
-  { id: "v3", x: 7, y: 58, label: "Makers", value: "63K", tone: "rose" },
-  { id: "v4", x: 22, y: 83, label: "Builders", value: "31K", tone: "gold" },
-  { id: "v5", x: 28, y: 19, label: "Designers", value: "27K", tone: "rose" },
-  { id: "v6", x: 19, y: 68, label: "Founders", value: "55K", tone: "sky" },
-  { id: "v7", x: 32, y: 48, label: "Analysts", value: "21K", tone: "mint" },
-  { id: "v8", x: 12, y: 90, label: "Fans", value: "39K", tone: "gold" },
+  { id: "v1", x: 6, y: 12, label: "Students", value: "42K", tone: "sky", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v2", x: 15, y: 34, label: "Shoppers", value: "18K", tone: "mint", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v3", x: 7, y: 58, label: "Families", value: "63K", tone: "rose", image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v4", x: 22, y: 83, label: "Commuters", value: "31K", tone: "gold", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v5", x: 28, y: 19, label: "Creators", value: "27K", tone: "rose", image: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v6", x: 19, y: 68, label: "Workers", value: "55K", tone: "sky", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v7", x: 32, y: 48, label: "Buyers", value: "21K", tone: "mint", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "v8", x: 12, y: 90, label: "Fans", value: "39K", tone: "gold", image: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?auto=format&fit=crop&w=96&h=96&q=55" },
 ];
 
 const businessNodes: NodePoint[] = [
-  { id: "b1", x: 92, y: 13, label: "Retail", value: "+312%" },
-  { id: "b2", x: 82, y: 34, label: "Food", value: "8.1K" },
-  { id: "b3", x: 94, y: 58, label: "Fintech", value: "94%" },
-  { id: "b4", x: 76, y: 82, label: "Events", value: "24h" },
-  { id: "b5", x: 68, y: 20, label: "Services", value: "Active" },
-  { id: "b6", x: 88, y: 78, label: "Health", value: "Live" },
-  { id: "b7", x: 70, y: 52, label: "Beauty", value: "High" },
-  { id: "b8", x: 86, y: 91, label: "Travel", value: "Ready" },
+  { id: "b1", x: 92, y: 13, label: "Retail owner", value: "+312%", image: "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b2", x: 82, y: 34, label: "Food owner", value: "8.1K", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b3", x: 94, y: 58, label: "Fintech owner", value: "94%", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b4", x: 76, y: 82, label: "Event owner", value: "24h", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b5", x: 68, y: 20, label: "Service owner", value: "Active", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b6", x: 88, y: 78, label: "Health owner", value: "Live", image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b7", x: 70, y: 52, label: "Beauty owner", value: "High", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=96&h=96&q=55" },
+  { id: "b8", x: 86, y: 91, label: "Travel owner", value: "Ready", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=96&h=96&q=55" },
 ];
 
 const hubNodes: NodePoint[] = [
@@ -110,6 +106,8 @@ const allConnections = [
   ),
 ];
 
+const visibleConnections = allConnections.filter((_, index) => index % 3 === 0);
+
 const stats = [
   { value: "30M+", label: "reachable mobile audience" },
   { value: "95%", label: "average video completion" },
@@ -149,12 +147,12 @@ const flowSteps = [
   {
     number: "02",
     title: "Launch the signal",
-    text: "Adbox distributes the campaign through viewer paths that already have attention.",
+    text: "Adbox distributes the campaign through customer paths that already have attention.",
   },
   {
     number: "03",
     title: "Watch demand form",
-    text: "Business owners see live results as viewers engage, share, visit, and buy.",
+    text: "Business owners see live results as customers engage, share, visit, and buy.",
   },
 ];
 
@@ -210,19 +208,15 @@ function NetworkNode({
     >
       {type === "viewer" ? (
         <>
-          <span className="viewer-avatar" aria-hidden="true">
-            <span className="avatar-hair" />
-            <span className="avatar-face">
-              <span className="avatar-eyes" />
-              <span className="avatar-smile" />
-            </span>
-            <span className="avatar-shirt" />
-          </span>
+          {node.image && <img className="node-photo" src={node.image} alt="" loading="eager" decoding="async" />}
           <span className="node-label">{node.label}</span>
           <span className="node-value">{node.value}</span>
         </>
       ) : (
         <>
+          {type === "business" && node.image && (
+            <img className="node-photo business-photo" src={node.image} alt="" loading="eager" decoding="async" />
+          )}
           <span className="node-value">{node.value}</span>
           <span className="node-label">{node.label}</span>
         </>
@@ -232,23 +226,13 @@ function NetworkNode({
 }
 
 function AdboxNetwork() {
-  const { scrollYProgress } = useScroll();
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 22,
-    mass: 0.4,
-  });
-  const rotate = useTransform(smoothProgress, [0, 1], [0, 110]);
-  const y = useTransform(smoothProgress, [0, 1], [0, -84]);
-  const lineOpacity = useTransform(smoothProgress, [0, 0.25, 0.8], [0.68, 1, 0.78]);
-
   return (
-    <m.div className="network-stage" style={{ y }}>
+    <div className="network-stage">
       <div className="network-halo halo-one" />
       <div className="network-halo halo-two" />
       <div className="network-copy left-copy">
         <Users className="h-4 w-4" />
-        <span>Open-source people</span>
+        <span>Customers</span>
       </div>
       <div className="network-copy right-copy">
         <Store className="h-4 w-4" />
@@ -263,15 +247,8 @@ function AdboxNetwork() {
             <stop offset="62%" stopColor="#b644f5" />
             <stop offset="100%" stopColor="#f85aef" />
           </linearGradient>
-          <filter id="softGlow">
-            <feGaussianBlur stdDeviation="1.1" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
-        {allConnections.map((connection, index) => {
+        {visibleConnections.map((connection, index) => {
           const midX = 50 + ((index % 7) - 3) * 2.8;
           const midY = 50 + ((index % 9) - 4) * 5.8;
           const path = `M ${connection.from.x} ${connection.from.y} Q ${midX} ${midY} ${connection.to.x} ${connection.to.y}`;
@@ -279,24 +256,16 @@ function AdboxNetwork() {
           const isDirect = connection.weight === "direct";
 
           return (
-            <g key={connection.id}>
-              <m.path
-                d={path}
-                fill="none"
-                stroke="url(#connectionGradient)"
-                strokeWidth={connection.weight === "core" ? "0.38" : isDirect ? "0.16" : isSoft ? "0.1" : "0.24"}
-                strokeLinecap="round"
-                strokeDasharray={isDirect ? "1.2 1.4" : undefined}
-                filter="url(#softGlow)"
-                style={{ opacity: lineOpacity }}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ delay: 0.55 + index * 0.04, duration: 1.2, ease: "easeInOut" }}
-              />
-              <m.circle r={isSoft ? "0.32" : isDirect ? "0.42" : "0.62"} fill={isSoft ? "#b644f5" : isDirect ? "#1de5e7" : "#ffffff"}>
-                <animateMotion dur={`${4 + (index % 5) * 0.35}s`} repeatCount="indefinite" path={path} />
-              </m.circle>
-            </g>
+            <path
+              key={connection.id}
+              d={path}
+              fill="none"
+              stroke="url(#connectionGradient)"
+              strokeWidth={connection.weight === "core" ? "0.42" : isDirect ? "0.18" : isSoft ? "0.12" : "0.26"}
+              strokeLinecap="round"
+              strokeDasharray={isDirect ? "1.2 1.4" : undefined}
+              opacity={isSoft ? 0.34 : isDirect ? 0.42 : 0.66}
+            />
           );
         })}
       </svg>
@@ -311,11 +280,11 @@ function AdboxNetwork() {
         <NetworkNode key={node.id} node={node} index={index} type="hub" />
       ))}
 
-      <m.div className="adbox-core" style={{ rotate }}>
+      <div className="adbox-core">
         <div className="orbit orbit-one" />
         <div className="orbit orbit-two" />
         <div className="core-disc">
-          <img src="/AdBox-icon-fullColor-gb-white.svg" alt="" />
+          <img src="/use%20this.png" alt="" />
           <span>Adbox</span>
         </div>
         <div className="satellite satellite-one">
@@ -327,38 +296,14 @@ function AdboxNetwork() {
         <div className="satellite satellite-three">
           <Zap className="h-4 w-4" />
         </div>
-      </m.div>
-    </m.div>
+      </div>
+    </div>
   );
-}
-
-function useMouseGlow() {
-  const x = useMotionValue(50);
-  const y = useMotionValue(30);
-
-  useEffect(() => {
-    const handleMove = (event: MouseEvent) => {
-      x.set((event.clientX / window.innerWidth) * 100);
-      y.set((event.clientY / window.innerHeight) * 100);
-    };
-
-    window.addEventListener("mousemove", handleMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [x, y]);
-
-  return useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, rgba(64, 167, 250, 0.2), transparent 32%), radial-gradient(circle at 78% 18%, rgba(248, 90, 239, 0.22), transparent 34%), linear-gradient(135deg, #060619 0%, #120a34 44%, #260849 100%)`;
 }
 
 export default function ModernAdboxLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const background = useMouseGlow();
-  const { scrollYProgress } = useScroll();
-  const progressScale = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
-    mass: 0.5,
-  });
 
   const navItems = useMemo(
     () => [
@@ -370,7 +315,20 @@ export default function ModernAdboxLanding() {
   );
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    let ticking = false;
+    let scrolled = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 24;
+        if (nextScrolled !== scrolled) {
+          scrolled = nextScrolled;
+          setIsScrolled(nextScrolled);
+        }
+        ticking = false;
+      });
+    };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -384,8 +342,6 @@ export default function ModernAdboxLanding() {
   return (
     <LazyMotion features={domAnimation}>
     <div className="adbox-page text-white">
-      <m.div className="scroll-progress" style={{ scaleX: progressScale }} />
-
       <nav className={`adbox-nav ${isScrolled ? "nav-scrolled" : ""}`}>
         <div className="nav-inner">
           <button className="brand-mark" onClick={() => scrollToSection("top")} aria-label="Go to top">
@@ -434,7 +390,7 @@ export default function ModernAdboxLanding() {
         )}
       </nav>
 
-      <m.section id="top" className="hero-section" style={{ background }}>
+      <m.section id="top" className="hero-section">
         <div className="grid-field" />
         <div className="hero-content">
           <m.div
@@ -445,13 +401,13 @@ export default function ModernAdboxLanding() {
           >
             <div className="eyebrow">
               <Sparkles className="h-4 w-4" />
-              Ghana's viewer to business network
+              Ghana's customer to business owner network
             </div>
             <h1>
-              A bigger, brighter way to connect viewers with businesses.
+              A bigger, brighter way to connect customers with business owners.
             </h1>
             <p>
-              Adbox connects business owners to people already watching, tapping,
+              Adbox connects business owners to customers already watching, tapping,
               sharing, and discovering. Launch a campaign, follow the signal, and
               see attention move through the network.
             </p>
@@ -494,7 +450,7 @@ export default function ModernAdboxLanding() {
           <h2>Customers and business owners do not sit in separate worlds anymore.</h2>
           <p>
             Adbox acts like a live bridge between attention and ambition:
-            viewers create momentum, businesses receive measurable demand, and the
+            customers create momentum, business owners receive measurable demand, and the
             network keeps learning where the next conversion should go.
           </p>
         </div>
@@ -568,20 +524,7 @@ export default function ModernAdboxLanding() {
         >
           <div className="iphone-island" />
           <div className="phone-screen">
-            <video
-              className="campaign-video"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
-            >
-              <source
-                src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-                type="video/mp4"
-              />
-            </video>
+            <div className="campaign-visual" />
             <div className="phone-video-shade" />
             <div className="phone-status">
               <span>9:41</span>
@@ -590,7 +533,7 @@ export default function ModernAdboxLanding() {
             <div className="phone-content">
               <div className="live-pill">Live campaign</div>
               <h3>Adbox signal preview</h3>
-              <p>Viewers are engaging with the campaign in real time.</p>
+              <p>Customers are engaging with the campaign in real time.</p>
             </div>
             <div className="metric-stack">
               <div>
@@ -626,7 +569,7 @@ export default function ModernAdboxLanding() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
             >
-              <img src={story.image} alt="" loading="lazy" decoding="async" />
+              <img src={story.image} alt="" width="900" height="600" loading="lazy" decoding="async" />
               <div className="story-overlay">
                 <span>{story.name}</span>
                 <strong>{story.metric}</strong>
@@ -668,7 +611,7 @@ export default function ModernAdboxLanding() {
           </div>
           <p>
             Ghana's digital advertising platform for connecting business owners
-            with viewers who can become customers.
+            with customers who are ready to act.
           </p>
         </div>
 
