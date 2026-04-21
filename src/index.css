@@ -1811,6 +1811,18 @@ body {
 }
 
 @media (max-width: 760px) {
+  .adbox-nav {
+    padding: 10px 14px;
+  }
+
+  .nav-inner {
+    min-height: 48px;
+  }
+
+  .brand-logo {
+    width: 108px;
+  }
+
   .desktop-nav {
     display: none;
   }
@@ -1820,64 +1832,237 @@ body {
   }
 
   .hero-section {
-    padding-top: 108px;
+    min-height: auto;
+    padding: 92px 14px 28px;
   }
 
   .hero-content {
     min-height: unset;
     grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .hero-copy h1 {
     max-width: 100%;
-    font-size: clamp(2.75rem, 13vw, 4.25rem);
-    line-height: 0.96;
+    font-size: clamp(2.35rem, 11.5vw, 3.45rem);
+    line-height: 1;
+  }
+
+  .hero-copy p {
+    margin-top: 18px;
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .eyebrow {
+    max-width: 100%;
+    margin-bottom: 16px;
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .hero-actions {
+    display: grid;
+    margin-top: 24px;
+    grid-template-columns: 1fr;
+  }
+
+  .primary-action,
+  .secondary-action {
+    width: 100%;
+    min-height: 48px;
   }
 
   .network-stage {
-    width: min(100%, 620px);
-    aspect-ratio: 0.82;
-    min-height: 620px;
+    width: min(100%, 430px);
+    height: clamp(340px, 104vw, 430px);
+    min-height: 0;
+    aspect-ratio: auto;
+    justify-self: center;
+    margin-top: 2px;
   }
 
   .network-node {
-    width: 78px;
-    min-height: 54px;
-    padding: 7px;
+    width: 58px;
+    min-height: 44px;
+    padding: 6px;
+    border-radius: 7px;
   }
 
   .viewer-node {
-    min-height: 86px;
+    min-height: 66px;
   }
 
   .node-photo {
-    width: 39px;
-    height: 39px;
+    width: 26px;
+    height: 26px;
+    margin-bottom: 2px;
   }
 
   .company-logo {
-    width: 34px;
-    height: 34px;
+    width: 25px;
+    height: 25px;
+    margin-bottom: 2px;
+  }
+
+  .node-value {
+    font-size: 0.72rem;
+  }
+
+  .node-label {
+    max-width: 48px;
+    overflow: hidden;
+    font-size: 0.52rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .hub-node {
-    width: 64px;
-    min-height: 64px;
+    width: 52px;
+    min-height: 52px;
   }
 
   .adbox-core {
-    width: 150px;
-    height: 150px;
+    width: 128px;
+    height: 128px;
   }
 
   .core-disc {
-    width: 98px;
-    height: 98px;
+    width: 82px;
+    height: 82px;
   }
 
   .core-disc img {
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .core-disc span {
+    margin-top: -14px;
+    font-size: 0.62rem;
+  }
+
+  .satellite {
+    width: 30px;
+    height: 30px;
+  }
+
+  .satellite-one {
+    top: 8px;
+  }
+
+  .satellite-two {
+    right: 4px;
+    bottom: 34px;
+  }
+
+  .satellite-three {
+    bottom: 22px;
+    left: 10px;
+  }
+
+  .network-copy {
+    padding: 7px 8px;
+    font-size: 0.68rem;
+  }
+
+  .left-copy {
+    left: 0;
+  }
+
+  .right-copy {
+    right: 0;
+  }
+
+  .network-node-v4,
+  .network-node-v6,
+  .network-node-v8,
+  .network-node-b4,
+  .network-node-b6,
+  .network-node-b8,
+  .network-node-h4 {
+    display: none;
+  }
+
+  .network-node-v1 {
+    left: 10% !important;
+    top: 17% !important;
+  }
+
+  .network-node-v2 {
+    left: 13% !important;
+    top: 42% !important;
+  }
+
+  .network-node-v3 {
+    left: 14% !important;
+    top: 68% !important;
+  }
+
+  .network-node-v5 {
+    left: 29% !important;
+    top: 25% !important;
+  }
+
+  .network-node-v7 {
+    left: 28% !important;
+    top: 62% !important;
+  }
+
+  .network-node-b1 {
+    left: 88% !important;
+    top: 18% !important;
+  }
+
+  .network-node-b2 {
+    left: 82% !important;
+    top: 43% !important;
+  }
+
+  .network-node-b3 {
+    left: 88% !important;
+    top: 68% !important;
+  }
+
+  .network-node-b5 {
+    left: 70% !important;
+    top: 26% !important;
+  }
+
+  .network-node-b7 {
+    left: 71% !important;
+    top: 61% !important;
+  }
+
+  .network-node-h1 {
+    left: 44% !important;
+    top: 30% !important;
+  }
+
+  .network-node-h2 {
+    left: 54% !important;
+    top: 47% !important;
+  }
+
+  .network-node-h3 {
+    left: 46% !important;
+    top: 66% !important;
+  }
+
+  .connection-canvas {
+    opacity: 0.56;
+  }
+
+  .hero-stat-row {
+    margin-top: 12px;
+  }
+
+  .stat-tile {
+    padding: 16px;
+  }
+
+  .stat-tile strong {
+    font-size: 1.9rem;
   }
 
   .hero-stat-row,
@@ -1916,6 +2101,16 @@ body {
   .team-image-wrap,
   .team-image-wrap img {
     min-height: 300px;
+  }
+
+  .network-story-section,
+  .app-download-section,
+  .compliance-section,
+  .results-section,
+  .cta-section,
+  .process-section {
+    padding-right: 14px;
+    padding-left: 14px;
   }
 
   .footer-section,

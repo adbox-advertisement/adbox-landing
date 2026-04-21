@@ -121,8 +121,8 @@ const stats = [
 const capabilities = [
   {
     icon: Target,
-    title: "Audience targeting",
-    text: "Build campaigns around location, interest, behavior, and phone-first attention patterns.",
+    title: "AI audience matching",
+    text: "Use AI to match campaigns with people by location, interest, behavior, and phone-first attention patterns.",
   },
   {
     icon: Video,
@@ -131,8 +131,8 @@ const capabilities = [
   },
   {
     icon: BarChart3,
-    title: "Live campaign intelligence",
-    text: "Track views, completion, audience response, and conversion signals while the campaign is still moving.",
+    title: "Live AI campaign intelligence",
+    text: "Track views, completion, audience response, and AI-assisted conversion signals while the campaign is still moving.",
   },
   {
     icon: Shield,
@@ -235,7 +235,7 @@ function NetworkNode({
           : type === "hub"
             ? "hub-node"
             : "business-node"
-      }`}
+      } network-node-${node.id}`}
       style={{ left: `${node.x}%`, top: `${node.y}%` }}
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -440,9 +440,9 @@ export default function ModernAdboxLanding() {
               A bigger, brighter way to connect customers with business owners.
             </h1>
             <p>
-              Adbox connects business owners to customers already watching, tapping,
-              sharing, and discovering. Launch a campaign, follow the signal, and
-              see attention move through the network.
+              Adbox uses AI to connect business owners with customers already
+              watching, tapping, sharing, and discovering. Launch a campaign,
+              follow the signal, and see attention move through the network.
             </p>
             <div className="hero-actions">
               <button className="primary-action" onClick={() => scrollToSection("download_app")}>
@@ -483,8 +483,8 @@ export default function ModernAdboxLanding() {
           <h2>Customers and business owners do not sit in separate worlds anymore.</h2>
           <p>
             Adbox acts like a live bridge between attention and ambition:
-            customers create momentum, business owners receive measurable demand, and the
-            network keeps learning where the next conversion should go.
+            customers create momentum, business owners receive measurable demand,
+            and AI helps the network learn where the next conversion should go.
           </p>
         </div>
 
