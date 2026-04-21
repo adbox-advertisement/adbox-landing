@@ -726,20 +726,13 @@ body {
 }
 
 .company-logo {
-  display: grid;
   width: 36px;
   height: 36px;
   margin-bottom: 4px;
-  place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.54);
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
-    linear-gradient(135deg, var(--adbox-blue), var(--adbox-magenta));
-  color: var(--adbox-blue);
-  font-size: 0.72rem;
-  font-weight: 950;
-  letter-spacing: 0;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .business-node {
@@ -910,6 +903,7 @@ body {
 
 .network-story-section,
 .app-download-section,
+.compliance-section,
 .results-section,
 .cta-section {
   padding: clamp(72px, 10vw, 136px) clamp(16px, 4vw, 48px);
@@ -1395,6 +1389,42 @@ body {
   height: 86%;
 }
 
+.compliance-section {
+  background: #ffffff;
+  color: var(--adbox-ink);
+}
+
+.compliance-grid {
+  display: grid;
+  max-width: 1240px;
+  margin: 0 auto;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.compliance-card {
+  min-height: 270px;
+  padding: 24px;
+  border: 1px solid rgba(71, 39, 252, 0.12);
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.compliance-card svg {
+  color: var(--adbox-blue);
+}
+
+.compliance-card h3 {
+  margin: 38px 0 12px;
+  font-size: 1.28rem;
+}
+
+.compliance-card p {
+  margin: 0;
+  color: rgba(6, 6, 25, 0.66);
+  line-height: 1.7;
+}
+
 .results-section {
   background:
     radial-gradient(circle at 20% 0%, rgba(71, 39, 252, 0.18), transparent 24%),
@@ -1512,6 +1542,19 @@ body {
   font-size: 0.95rem;
 }
 
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 18px;
+}
+
+.footer-legal a {
+  color: rgba(248, 251, 255, 0.78);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
 .footer-contact {
   display: flex;
   flex-wrap: wrap;
@@ -1595,6 +1638,108 @@ body {
   color: #ffffff;
 }
 
+.legal-page {
+  min-height: 100vh;
+  padding: 34px clamp(16px, 4vw, 48px) 72px;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(29, 229, 231, 0.16), transparent 24%),
+    radial-gradient(circle at 86% 12%, rgba(248, 90, 239, 0.16), transparent 24%),
+    #f8fbff;
+  color: var(--adbox-ink);
+}
+
+.legal-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.legal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--adbox-blue);
+  font-weight: 850;
+}
+
+.legal-header {
+  margin-top: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(6, 6, 25, 0.12);
+}
+
+.legal-header img {
+  width: 142px;
+  height: auto;
+}
+
+.legal-header span {
+  display: block;
+  margin-top: 26px;
+  color: rgba(6, 6, 25, 0.58);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.legal-header h1 {
+  margin: 12px 0 0;
+  font-size: clamp(2.3rem, 5vw, 5.2rem);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.legal-header p {
+  max-width: 760px;
+  margin: 20px 0 0;
+  color: rgba(6, 6, 25, 0.68);
+  line-height: 1.8;
+}
+
+.legal-content {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.legal-content section {
+  padding: 24px;
+  border: 1px solid rgba(71, 39, 252, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.legal-content h2 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+}
+
+.legal-content p {
+  margin: 0;
+  color: rgba(6, 6, 25, 0.68);
+  line-height: 1.78;
+}
+
+.legal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.legal-footer a,
+.legal-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(71, 39, 252, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  color: rgba(6, 6, 25, 0.72);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 @keyframes softBounce {
   0%,
   100% {
@@ -1655,6 +1800,7 @@ body {
   }
 
   .signal-grid,
+  .compliance-grid,
   .story-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1736,6 +1882,7 @@ body {
 
   .hero-stat-row,
   .signal-grid,
+  .compliance-grid,
   .story-grid {
     grid-template-columns: 1fr;
   }

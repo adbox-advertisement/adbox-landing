@@ -28,6 +28,7 @@ import {
   domAnimation,
   m,
 } from "framer-motion";
+import { Link } from "wouter";
 
 type NodePoint = {
   id: string;
@@ -52,14 +53,14 @@ const viewerNodes: NodePoint[] = [
 ];
 
 const businessNodes: NodePoint[] = [
-  { id: "b1", x: 92, y: 13, label: "Retail Co.", value: "+312%", logo: "RC" },
-  { id: "b2", x: 82, y: 34, label: "Food Lab", value: "8.1K", logo: "FL" },
-  { id: "b3", x: 94, y: 58, label: "PayGrid", value: "94%", logo: "PG" },
-  { id: "b4", x: 76, y: 82, label: "Event Hub", value: "24h", logo: "EH" },
-  { id: "b5", x: 68, y: 20, label: "Service Pro", value: "Active", logo: "SP" },
-  { id: "b6", x: 88, y: 78, label: "Health Plus", value: "Live", logo: "H+" },
-  { id: "b7", x: 70, y: 52, label: "Beauty Co.", value: "High", logo: "BC" },
-  { id: "b8", x: 86, y: 91, label: "Travel Go", value: "Ready", logo: "TG" },
+  { id: "b1", x: 92, y: 13, label: "Retail Co.", value: "+312%", logo: "/brand-logos/1.webp" },
+  { id: "b2", x: 82, y: 34, label: "Food Lab", value: "8.1K", logo: "/brand-logos/2.webp" },
+  { id: "b3", x: 94, y: 58, label: "PayGrid", value: "94%", logo: "/brand-logos/3.webp" },
+  { id: "b4", x: 76, y: 82, label: "Event Hub", value: "24h", logo: "/brand-logos/4.webp" },
+  { id: "b5", x: 68, y: 20, label: "Service Pro", value: "Active", logo: "/brand-logos/5.webp" },
+  { id: "b6", x: 88, y: 78, label: "Health Plus", value: "Live", logo: "/brand-logos/6.webp" },
+  { id: "b7", x: 70, y: 52, label: "Beauty Co.", value: "High", logo: "/brand-logos/7.webp" },
+  { id: "b8", x: 86, y: 91, label: "Travel Go", value: "Ready", logo: "/brand-logos/8.webp" },
 ];
 
 const hubNodes: NodePoint[] = [
@@ -183,8 +184,36 @@ const storyCards = [
 ];
 
 const appDownloadLinks = [
-  { label: "Download for iPhone", detail: "App Store", icon: Apple },
-  { label: "Download for Android", detail: "Google Play", icon: Smartphone },
+  {
+    label: "iPhone app link",
+    detail: "Request download",
+    href: "mailto:info@adboxgh.com?subject=Adbox%20iPhone%20app%20download%20link",
+    icon: Apple,
+  },
+  {
+    label: "Android app link",
+    detail: "Request download",
+    href: "mailto:info@adboxgh.com?subject=Adbox%20Android%20app%20download%20link",
+    icon: Smartphone,
+  },
+];
+
+const reviewDisclosures = [
+  {
+    icon: Shield,
+    title: "Google and Facebook login",
+    text: "Adbox uses Google and Facebook login only to create, secure, and recover user accounts. We request basic profile information such as name and email address, and we do not sell OAuth data.",
+  },
+  {
+    icon: Smartphone,
+    title: "WhatsApp OTP verification",
+    text: "Adbox uses WhatsApp OTP only when a user requests phone verification. One-time codes are time-limited and are not used for marketing messages.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "User control",
+    text: "Users can review our privacy policy, terms, support contact, and data deletion instructions from this website before using Adbox services.",
+  },
 ];
 
 function NetworkNode({
@@ -222,9 +251,7 @@ function NetworkNode({
       ) : (
         <>
           {type === "business" && node.logo && (
-            <span className="company-logo" aria-hidden="true">
-              {node.logo}
-            </span>
+            <img className="company-logo" src={node.logo} alt="" loading="eager" decoding="async" />
           )}
           <span className="node-value">{node.value}</span>
           <span className="node-label">{node.label}</span>
@@ -572,7 +599,7 @@ export default function ModernAdboxLanding() {
           </p>
           <div className="download-actions">
             {appDownloadLinks.map((item) => (
-              <a key={item.label} href="#" className="store-button" aria-label={item.label}>
+              <a key={item.label} href={item.href} className="store-button" aria-label={item.label}>
                 <item.icon className="h-6 w-6" />
                 <span>
                   <small>{item.detail}</small>
@@ -601,6 +628,27 @@ export default function ModernAdboxLanding() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="compliance-section">
+        <div className="section-heading">
+          <span>Platform review disclosures</span>
+          <h2>Clear use of login and verification data.</h2>
+          <p>
+            These disclosures explain how Adbox intends to use OAuth login and
+            WhatsApp OTP verification for account access, security, and user
+            control.
+          </p>
+        </div>
+        <div className="compliance-grid">
+          {reviewDisclosures.map((item) => (
+            <article key={item.title} className="compliance-card">
+              <item.icon className="h-7 w-7" />
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -664,6 +712,12 @@ export default function ModernAdboxLanding() {
             Ghana's digital advertising platform for connecting business owners
             with customers who are ready to act.
           </p>
+          <div className="footer-legal">
+            <Link href="/privacy-policy">Privacy Policy</Link>
+            <Link href="/terms">Terms</Link>
+            <Link href="/data-deletion">Data Deletion</Link>
+            <Link href="/support">Support</Link>
+          </div>
         </div>
 
         <div className="footer-contact">
