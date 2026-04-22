@@ -26,17 +26,17 @@ function ComplianceShell({
         </header>
         <div className="legal-content">{children}</div>
         <footer className="legal-footer">
-          <a href="mailto:info@adboxgh.com">
+          <a href="mailto:info@adbox.com">
             <Mail className="h-4 w-4" />
-            info@adboxgh.com
+            info@adbox.com
           </a>
-          <a href="tel:+233538897225">
+          <a href="mailto:info@adbox.com?subject=Contact%20sales">
             <Phone className="h-4 w-4" />
-            +233 53 889 7225
+            Contact sales
           </a>
           <span>
             <MapPin className="h-4 w-4" />
-            Accra, Ghana
+            Global support
           </span>
         </footer>
       </div>
@@ -93,7 +93,7 @@ export function PrivacyPolicy() {
           We keep account data while the account is active or as needed for
           service, legal, security, and fraud-prevention purposes. Users can
           request deletion through our Data Deletion page or by emailing
-          info@adboxgh.com.
+          info@adbox.com.
         </p>
       </section>
     </ComplianceShell>
@@ -151,7 +151,7 @@ export function DataDeletion() {
       <section>
         <h2>How To Request Deletion</h2>
         <p>
-          Email info@adboxgh.com with the subject "Data Deletion Request" and
+          Email info@adbox.com with the subject "Data Deletion Request" and
           include the email address, phone number, or social login used with the
           Adbox account. We may ask for reasonable verification before deleting
           account data.
@@ -186,8 +186,8 @@ export function Support() {
       <section>
         <h2>Contact</h2>
         <p>
-          Email info@adboxgh.com or call +233 53 889 7225. Adbox is based in
-          Accra, Ghana.
+          Email info@adbox.com for account, campaign, privacy, and verification
+          support.
         </p>
       </section>
       <section>

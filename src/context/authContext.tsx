@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (data?.token) {
         Storage.saveToken(data.token);
-        window.location.href = `https://dashboard.adboxgh.com?token=${data.token}`;
+        window.location.href = `https://dashboard.adbox.com?token=${data.token}`;
       } else {
         setError(data?.message || "Signup failed");
       }

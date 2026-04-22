@@ -42,7 +42,7 @@ export default function CampaignAnalyticsPhone() {
                 {/* Stats Card */}
                 <div className="bg-white rounded-2xl p-4 shadow-lg">
                   <div className="text-sm font-semibold text-gray-800 mb-3">
-                    MTN Ghana Campaign
+                    AI Growth Campaign
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
